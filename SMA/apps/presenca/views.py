@@ -1,59 +1,51 @@
-from django.http import JsonResponse
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from apps.aluno.models import Aluno
-from apps.presenca.models import Presencas, PresencaAluno
-import json
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Presencas, PresencaAluno
+from .forms import PresencasForm, PresencaAlunoForm
 
-@csrf_exempt
-def     registrar_presenca(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Método não permitido"}, status=405)
+def presencas_list(request):
+    presencas = Presencas.objects.all()
+    return render(request, 'presencas/list.html', {
+        'presencas': presencas
+    })
 
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-        uid = data.get("uid")
+def presencas_create(request):
+    if request.method == 'POST':
+        form = PresencasForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('presencas_list')
+    else:
+        form = PresencasForm()
 
-        if not uid:
-            return JsonResponse({"error": "UID não informado"}, status=400)
+    return render(request, 'presencas/form.html', {
+        'form': form,
+        'titulo': 'Cadastrar Presença'
+    })
 
-        try:
-            aluno = Aluno.objects.get(uid=uid)
-        except Aluno.DoesNotExist:
-            return JsonResponse({"error": "Aluno não encontrado"}, status=404)
 
-        # Verifica se o aluno já tem presença hoje
-        hoje = timezone.localdate()
-        presenca = Presencas.objects.filter(data=hoje).first()
+def presencas_edit(request, presenca_id):
+    presenca = get_object_or_404(Presencas, id=presenca_id)
 
-        if not presenca:
-            # Cria a presença do dia se ainda não existir
-            presenca = Presencas.objects.create(
-                data=hoje,
-                horario_entrada=timezone.now().time(),
-                horario_saida=None
-            )
+    if request.method == 'POST':
+        form = PresencasForm(request.POST, instance=presenca)
+        if form.is_valid():
+            form.save()
+            return redirect('presencas_list')
+    else:
+        form = PresencasForm(instance=presenca)
 
-        # Verifica se o aluno já marcou entrada hoje
-        relacao = PresencaAluno.objects.filter(presenca=presenca, aluno=aluno).first()
+    return render(request, 'presencas/form.html', {
+        'form': form,
+        'titulo': 'Editar Presença'
+    })
 
-        if not relacao:
-            # Marca entrada
-            PresencaAluno.objects.create(presenca=presenca, aluno=aluno)
-            status = "ENTRADA"
-        else:
-            # Marca saída (atualiza horário_saida)
-            presenca.horario_saida = timezone.now().time()
-            presenca.save()
-            status = "SAÍDA"
+def presencas_delete(request, presenca_id):
+    presenca = get_object_or_404(Presencas, id=presenca_id)
 
-        return JsonResponse({
-            "aluno": aluno.nome,
-            "uid": uid,
-            "status": status,
-            "data": str(hoje),
-            "hora": timezone.now().strftime("%H:%M:%S")
-        })
+    if request.method == 'POST':
+        presenca.delete()
+        return redirect('presencas_list')
 
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    return render(request, 'presencas/delete.html', {
+        'presenca': presenca
+    })
