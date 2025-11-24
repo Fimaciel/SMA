@@ -1,0 +1,152 @@
+{% load bootstrap5 %}
+
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Sistema de Gestão Acadêmica{% endblock %}</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> {# Font Awesome para ícones #}
+    <style>
+      body {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f8f9fa; /* Light background */
+      }
+      #sidebar {
+        min-width: 250px;
+        max-width: 250px;
+        background-color: #343a40; /* Dark sidebar */
+        color: white;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        padding-top: 1rem;
+      }
+      #sidebar.active {
+        margin-left: -250px;
+      }
+      #content {
+        width: 100%;
+        padding: 20px;
+        min-height: 100vh;
+        transition: all 0.3s;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: #212529;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .sidebar-header h3 {
+        color: white;
+        margin-bottom: 0;
+      }
+      .list-unstyled.components li a {
+        padding: 10px 20px;
+        color: #adb5bd;
+        text-decoration: none;
+        display: block;
+      }
+      .list-unstyled.components li a:hover {
+        color: #ffffff;
+        background: #495057;
+      }
+      .list-unstyled.components li.active > a, a[aria-expanded="true"] {
+        color: #fff;
+        background: #007bff; /* Active item background */
+      }
+      @media (max-width: 768px) {
+        #sidebar {
+          margin-left: -250px;
+        }
+        #sidebar.active {
+          margin-left: 0;
+        }
+        #content.active {
+            width: calc(100% - 250px);
+        }
+        #sidebarCollapse {
+            display: block; /* Show hamburger button on small screens */
+        }
+      }
+      #sidebarCollapse {
+        display: none; /* Hide by default on large screens */
+        margin-left: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h3>SMA Admin</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li>
+                <a href="{% url 'dashboard' %}"><i class="fas fa-th-large"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="{% url 'presenca:aula_controle' %}"><i class="fas fa-chalkboard"></i> Controle de Aula</a>
+            </li>
+            <li>
+                <a href="{% url 'aluno:aluno_list' %}"><i class="fas fa-users"></i> Gerenciar Alunos</a>
+            </li>
+            <li>
+                <a href="{% url 'presenca:historico' %}"><i class="fas fa-history"></i> Histórico</a>
+            </li>
+            <li>
+                <a href="#"><i class="fas fa-cogs"></i> Configurações</a>
+            </li>
+        </ul>
+        <ul class="list-unstyled CTAs mt-auto"> {# Push to bottom #}
+            <li>
+                <a href="{% url 'logout' %}" class="btn btn-danger btn-block"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <i class="fas fa-align-left"></i>
+                    <span>Menu</span>
+                </button>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="badge bg-success me-2"><i class="fas fa-circle"></i> Online</span> {# Status Indicator #}
+                    <span class="navbar-text me-2">Olá, Professor!</span> {# User Profile #}
+                    <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-circle"></i> Perfil</a>
+                </div>
+            </div>
+        </nav>
+
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {% bootstrap_javascript %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebarCollapse = document.getElementById('sidebarCollapse');
+            if (sidebarCollapse) {
+                sidebarCollapse.addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                    document.getElementById('content').classList.toggle('active');
+                });
+            }
+        });
+    </script>
+  </body>
+</html>
