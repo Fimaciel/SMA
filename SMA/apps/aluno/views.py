@@ -1,39 +1,27 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .forms import AlunoForm
 from .models import Aluno
 
-# CREATE - Página de formulário
-def create(request):
-    if request.method == 'POST':
-        form = AlunoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('alunos_index') 
-    else:
-        form = AlunoForm()
-    return render(request, 'aluno/create.html', {'form': form})
+class AlunoListView(ListView):
+    model = Aluno
+    template_name = 'aluno/aluno_list.html'
+    context_object_name = 'alunos'
+    paginate_by = 10
 
+class AlunoCreateView(CreateView):
+    model = Aluno
+    form_class = AlunoForm
+    template_name = 'aluno/aluno_form.html'
+    success_url = reverse_lazy('aluno:aluno_list')
 
-# READ - Listar todos os alunos
-def index(request):
-    alunos = Aluno.objects.all()
-    return render(request, 'aluno/index.html', {'alunos': alunos})
+class AlunoUpdateView(UpdateView):
+    model = Aluno
+    form_class = AlunoForm
+    template_name = 'aluno/aluno_form.html'
+    success_url = reverse_lazy('aluno:aluno_list')
 
-
-# UPDATE - Editar um aluno existente
-def edit(request, aluno_id):
-    aluno = get_object_or_404(Aluno, id=aluno_id)
-    form = AlunoForm(request.POST or None, instance=aluno)
-    if form.is_valid():
-        form.save() 
-        return redirect('alunos_index')
-    return render(request, 'aluno/edit.html', {'form': form, 'aluno': aluno})
-
-
-# DELETE - Excluir um aluno
-def destroy(request, aluno_id):
-    aluno = get_object_or_404(Aluno, id=aluno_id)
-    if request.method == 'POST':
-        aluno.delete()
-        return redirect('alunos_index')
-    return render(request, 'aluno/confirm_delete.html', {'aluno': aluno})
+class AlunoDeleteView(DeleteView):
+    model = Aluno
+    template_name = 'aluno/aluno_confirm_delete.html'
+    success_url = reverse_lazy('aluno:aluno_list')

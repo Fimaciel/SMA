@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}Gerenciar Alunos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Alunos</h1>
+    <a href="{% url 'aluno:aluno_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Adicionar Aluno
+    </a>
+</div>
+
+{% if alunos %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Matrícula</th>
+                        <th>Período</th>
+                        <th>UID RFID</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                    <tr>
+                        <td>{{ aluno.nome }}</td>
+                        <td>{{ aluno.cpf }}</td>
+                        <td>{{ aluno.matricula }}</td>
+                        <td>{{ aluno.periodo }}</td>
+                        <td>{{ aluno.uid }}</td>
+                        <td>
+                            <a href="{% url 'aluno:aluno_edit' aluno.pk %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'aluno:aluno_delete' aluno.pk %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    Nenhum aluno cadastrado. <a href="{% url 'aluno:aluno_add' %}" class="alert-link">Adicione um novo aluno agora!</a>
+</div>
+{% endif %}
+
+{% endblock %}

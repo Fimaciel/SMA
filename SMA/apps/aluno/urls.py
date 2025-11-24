@@ -1,9 +1,11 @@
 from django.urls import path
-from . import views
+from .views import AlunoListView, AlunoCreateView, AlunoUpdateView, AlunoDeleteView
+
+app_name = 'aluno'
 
 urlpatterns = [
-    path('index', views.index, name='alunos_index'),
-    path('create/', views.create, name='alunos_create'),
-    path('editar/<int:aluno_id>/', views.edit, name='alunos_edit'),
-    path('deletar/<int:aluno_id>/', views.destroy, name='alunos_destroy'),
+    path('', AlunoListView.as_view(), name='aluno_list'),
+    path('add/', AlunoCreateView.as_view(), name='aluno_add'),
+    path('<int:pk>/edit/', AlunoUpdateView.as_view(), name='aluno_edit'),
+    path('<int:pk>/delete/', AlunoDeleteView.as_view(), name='aluno_delete'),
 ]
