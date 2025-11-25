@@ -1,9 +1,11 @@
 from django.urls import path
-from . import views
+from .views import DisciplinaListView, DisciplinaCreateView, DisciplinaUpdateView, DisciplinaDeleteView
+
+app_name = 'disciplina'
 
 urlpatterns = [
-    path('', views.disciplina_list, name='disciplina_list'),
-    path('create/', views.disciplina_create, name='disciplina_create'),
-    path('edit/<int:disciplina_id>/', views.disciplina_edit, name='disciplina_edit'),
-    path('delete/<int:disciplina_id>/', views.disciplina_delete, name='disciplina_delete'),
+    path('', DisciplinaListView.as_view(), name='disciplina_list'),
+    path('add/', DisciplinaCreateView.as_view(), name='disciplina_add'),
+    path('<int:pk>/edit/', DisciplinaUpdateView.as_view(), name='disciplina_edit'),
+    path('<int:pk>/delete/', DisciplinaDeleteView.as_view(), name='disciplina_delete'),
 ]

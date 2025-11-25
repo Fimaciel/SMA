@@ -1,46 +1,27 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Disciplina
 from .forms import DisciplinaForm
 
-def disciplina_list(request):
-    disciplinas = Disciplina.objects.all()
-    return render(request, 'disciplina/list.html', {'disciplinas': disciplinas})
+class DisciplinaListView(ListView):
+    model = Disciplina
+    template_name = 'disciplina/disciplina_list.html'
+    context_object_name = 'disciplinas'
+    paginate_by = 10
 
-def disciplina_create(request):
-    if request.method == 'POST':
-        form = DisciplinaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('disciplina_list')
-    else:
-        form = DisciplinaForm()
+class DisciplinaCreateView(CreateView):
+    model = Disciplina
+    form_class = DisciplinaForm
+    template_name = 'disciplina/disciplina_form.html'
+    success_url = reverse_lazy('disciplina:disciplina_list')
 
-    return render(request, 'disciplina/form.html', {
-        'form': form,
-        'titulo': 'Cadastrar Disciplina'
-    })
+class DisciplinaUpdateView(UpdateView):
+    model = Disciplina
+    form_class = DisciplinaForm
+    template_name = 'disciplina/disciplina_form.html'
+    success_url = reverse_lazy('disciplina:disciplina_list')
 
-def disciplina_edit(request, disciplina_id):
-    disciplina = get_object_or_404(Disciplina, id=disciplina_id)
-
-    if request.method == 'POST':
-        form = DisciplinaForm(request.POST, instance=disciplina)
-        if form.is_valid():
-            form.save()
-            return redirect('disciplina_list')
-    else:
-        form = DisciplinaForm(instance=disciplina)
-
-    return render(request, 'disciplina/form.html', {
-        'form': form,
-        'titulo': 'Editar Disciplina'
-    })
-
-def disciplina_delete(request, disciplina_id):
-    disciplina = get_object_or_404(Disciplina, id=disciplina_id)
-
-    if request.method == 'POST':
-        disciplina.delete()
-        return redirect('disciplina_list')
-
-    return render(request, 'disciplina/delete.html', {'disciplina': disciplina})
+class DisciplinaDeleteView(DeleteView):
+    model = Disciplina
+    template_name = 'disciplina/disciplina_confirm_delete.html'
+    success_url = reverse_lazy('disciplina:disciplina_list')

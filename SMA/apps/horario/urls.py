@@ -1,9 +1,11 @@
 from django.urls import path
-from . import views
+from .views import HorarioListView, HorarioCreateView, HorarioUpdateView, HorarioDeleteView
+
+app_name = 'horario'
 
 urlpatterns = [
-    path('', views.horarios_list, name='horarios_list'),
-    path('novo/', views.horarios_create, name='horarios_create'),
-    path('<int:horario_id>/editar/', views.horarios_edit, name='horarios_edit'),
-    path('<int:horario_id>/excluir/', views.horarios_delete, name='horarios_delete'),
+    path('', HorarioListView.as_view(), name='horario_list'),
+    path('add/', HorarioCreateView.as_view(), name='horario_add'),
+    path('<int:pk>/edit/', HorarioUpdateView.as_view(), name='horario_edit'),
+    path('<int:pk>/delete/', HorarioDeleteView.as_view(), name='horario_delete'),
 ]

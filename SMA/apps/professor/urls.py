@@ -1,9 +1,11 @@
 from django.urls import path
-from . import views
+from .views import ProfessorListView, ProfessorCreateView, ProfessorUpdateView, ProfessorDeleteView
+
+app_name = 'professor'
 
 urlpatterns = [
-    path('', views.professor_list, name='professor_list'),
-    path('novo/', views.professor_create, name='professor_create'),
-    path('<int:professor_id>/editar/', views.professor_edit, name='professor_edit'),
-    path('<int:professor_id>/excluir/', views.professor_delete, name='professor_delete'),
+    path('', ProfessorListView.as_view(), name='professor_list'),
+    path('add/', ProfessorCreateView.as_view(), name='professor_add'),
+    path('<int:pk>/edit/', ProfessorUpdateView.as_view(), name='professor_edit'),
+    path('<int:pk>/delete/', ProfessorDeleteView.as_view(), name='professor_delete'),
 ]

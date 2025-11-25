@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4 text-gray-800">Confirmar Exclusão</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-danger">Confirmar Exclusão</h6>
+    </div>
+    <div class="card-body">
+        <p>Você tem certeza que deseja excluir o professor <strong>{{ object.nome }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Sim, excluir
+            </button>
+            <a href="{% url 'professor:professor_list' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}
