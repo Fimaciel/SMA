@@ -1,7 +1,7 @@
 from django import forms
 from .models import Horarios, Disciplina
 
-class HorarioForm(forms.ModelForm):
+class HorariosForm(forms.ModelForm):
     disciplinas = forms.ModelMultipleChoiceField(
         queryset=Disciplina.objects.all(),
         widget=forms.CheckboxSelectMultiple,
