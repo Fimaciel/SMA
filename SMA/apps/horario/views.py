@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Horarios, DisciplinaHorario
-from .forms import HorariosForm, DisciplinaHorarioForm
+from .forms import HorariosForm
 
 def horarios_list(request):
     horarios = Horarios.objects.all()

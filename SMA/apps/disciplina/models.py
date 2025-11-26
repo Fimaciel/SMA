@@ -6,3 +6,13 @@ class Disciplina(models.Model):
     carga_horaria = models.PositiveIntegerField() 
 
     def __str__(self): return self.nome
+
+
+class Aula(models.Model):
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE)
+    data = models.DateField()
+    horario_inicio = models.TimeField()
+    horario_fim = models.TimeField()
+
+    def __str__(self):
+        return f"{self.disciplina.nome} - {self.data}"
