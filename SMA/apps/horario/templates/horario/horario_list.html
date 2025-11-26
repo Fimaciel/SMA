@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}Gerenciar Horários{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Horários</h1>
+    <a href="{% url 'horario:horario_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Adicionar Horário
+    </a>
+</div>
+
+{% if horarios %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Disciplinas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for horario in horarios %}
+                    <tr>
+                        <td>{{ horario.data|date:"d/m/Y" }}</td>
+                        <td>{{ horario.hora|time:"H:i" }}</td>
+                        <td>
+                            {% for disciplina in horario.disciplinas.all %}
+                                <span class="badge bg-secondary">{{ disciplina.nome }}</span>
+                            {% empty %}
+                                Nenhuma
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <a href="{% url 'horario:horario_edit' horario.pk %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'horario:horario_delete' horario.pk %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    Nenhum horário cadastrado. <a href="{% url 'horario:horario_add' %}" class="alert-link">Adicione um novo horário agora!</a>
+</div>
+{% endif %}
+
+{% endblock %}

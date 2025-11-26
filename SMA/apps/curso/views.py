@@ -1,44 +1,27 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Curso
 from .forms import CursoForm
 
-# LISTAR
-def curso_list(request):
-    cursos = Curso.objects.all()
-    return render(request, 'curso/list.html', {'cursos': cursos})
+class CursoListView(ListView):
+    model = Curso
+    template_name = 'curso/curso_list.html'
+    context_object_name = 'cursos'
+    paginate_by = 10
 
-# CRIAR
-def curso_create(request):
-    if request.method == 'POST':
-        form = CursoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('curso_list')
-    else:
-        form = CursoForm()
+class CursoCreateView(CreateView):
+    model = Curso
+    form_class = CursoForm
+    template_name = 'curso/curso_form.html'
+    success_url = reverse_lazy('curso:curso_list')
 
-    return render(request, 'curso/form.html', {'form': form, 'titulo': 'Cadastrar Curso'})
+class CursoUpdateView(UpdateView):
+    model = Curso
+    form_class = CursoForm
+    template_name = 'curso/curso_form.html'
+    success_url = reverse_lazy('curso:curso_list')
 
-# EDITAR
-def curso_edit(request, curso_id):
-    curso = get_object_or_404(Curso, id=curso_id)
-
-    if request.method == 'POST':
-        form = CursoForm(request.POST, instance=curso)
-        if form.is_valid():
-            form.save()
-            return redirect('curso_list')
-    else:
-        form = CursoForm(instance=curso)
-
-    return render(request, 'curso/form.html', {'form': form, 'titulo': 'Editar Curso'})
-
-# DELETAR
-def curso_delete(request, curso_id):
-    curso = get_object_or_404(Curso, id=curso_id)
-
-    if request.method == 'POST':
-        curso.delete()
-        return redirect('curso_list')
-
-    return render(request, 'curso/delete.html', {'curso': curso})
+class CursoDeleteView(DeleteView):
+    model = Curso
+    template_name = 'curso/curso_confirm_delete.html'
+    success_url = reverse_lazy('curso:curso_list')

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}{% if object %}Editar Disciplina{% else %}Adicionar Disciplina{% endif %}{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4 text-gray-800">{% if object %}Editar Disciplina{% else %}Adicionar Disciplina{% endif %}</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if object %}Salvar Alterações{% else %}Salvar{% endif %}
+            </button>
+            <a href="{% url 'disciplina:disciplina_list' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

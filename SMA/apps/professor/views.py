@@ -1,50 +1,50 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Professor, ProfessorDisciplina
-from .forms import ProfessorForm, ProfessorDisciplinaForm
+from .forms import ProfessorForm
 
-def professor_list(request):
-    professores = Professor.objects.all()
-    return render(request, 'professor/list.html', {
-        'professores': professores
-    })
+class ProfessorListView(ListView):
+    model = Professor
+    template_name = 'professor/professor_list.html'
+    context_object_name = 'professores'
+    paginate_by = 10
 
-def professor_create(request):
-    if request.method == 'POST':
-        form = ProfessorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('professor_list')
-    else:
-        form = ProfessorForm()
+class ProfessorCreateView(CreateView):
+    model = Professor
+    form_class = ProfessorForm
+    template_name = 'professor/professor_form.html'
+    success_url = reverse_lazy('professor:professor_list')
 
-    return render(request, 'professor/form.html', {
-        'form': form,
-        'titulo': 'Cadastrar Professor'
-    })
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        disciplinas = form.cleaned_data.get('disciplinas')
+        if disciplinas:
+            self.object.professordisciplina_set.all().delete()
+            for disciplina in disciplinas:
+                ProfessorDisciplina.objects.create(professor=self.object, disciplina=disciplina)
+        return response
 
-def professor_edit(request, professor_id):
-    professor = get_object_or_404(Professor, id=professor_id)
+class ProfessorUpdateView(UpdateView):
+    model = Professor
+    form_class = ProfessorForm
+    template_name = 'professor/professor_form.html'
+    success_url = reverse_lazy('professor:professor_list')
 
-    if request.method == 'POST':
-        form = ProfessorForm(request.POST, instance=professor)
-        if form.is_valid():
-            form.save()
-            return redirect('professor_list')
-    else:
-        form = ProfessorForm(instance=professor)
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['disciplinas'] = self.object.professordisciplina_set.values_list('disciplina_id', flat=True)
+        return initial
 
-    return render(request, 'professor/form.html', {
-        'form': form,
-        'titulo': 'Editar Professor'
-    })
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        disciplinas = form.cleaned_data.get('disciplinas')
+        if disciplinas:
+            self.object.professordisciplina_set.all().delete()
+            for disciplina in disciplinas:
+                ProfessorDisciplina.objects.create(professor=self.object, disciplina=disciplina)
+        return response
 
-def professor_delete(request, professor_id):
-    professor = get_object_or_404(Professor, id=professor_id)
-
-    if request.method == 'POST':
-        professor.delete()
-        return redirect('professor_list')
-
-    return render(request, 'professor/delete.html', {
-        'professor': professor
-    })
+class ProfessorDeleteView(DeleteView):
+    model = Professor
+    template_name = 'professor/professor_confirm_delete.html'
+    success_url = reverse_lazy('professor:professor_list')

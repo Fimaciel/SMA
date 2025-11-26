@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block title %}Gerenciar Disciplinas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Disciplinas</h1>
+    <a href="{% url 'disciplina:disciplina_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Adicionar Disciplina
+    </a>
+</div>
+
+{% if disciplinas %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Carga Horária</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for disciplina in disciplinas %}
+                    <tr>
+                        <td>{{ disciplina.nome }}</td>
+                        <td>{{ disciplina.carga_horaria }}h</td>
+                        <td>
+                            <a href="{% url 'disciplina:disciplina_edit' disciplina.pk %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'disciplina:disciplina_delete' disciplina.pk %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    Nenhuma disciplina cadastrada. <a href="{% url 'disciplina:disciplina_add' %}" class="alert-link">Adicione uma nova disciplina agora!</a>
+</div>
+{% endif %}
+
+{% endblock %}

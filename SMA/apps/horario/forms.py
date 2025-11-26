@@ -1,12 +1,17 @@
 from django import forms
-from .models import Horarios, DisciplinaHorario
+from .models import Horarios, Disciplina
 
-class HorariosForm(forms.ModelForm):
+class HorarioForm(forms.ModelForm):
+    disciplinas = forms.ModelMultipleChoiceField(
+        queryset=Disciplina.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True
+    )
+
     class Meta:
         model = Horarios
         fields = ['data', 'hora', 'disciplinas']
         widgets = {
-            'data': forms.DateInput(attrs={'type': 'date'}),
-            'hora': forms.TimeInput(attrs={'type': 'time'}),
-            'disciplinas': forms.CheckboxSelectMultiple()
+            'data': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'hora': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
         }
