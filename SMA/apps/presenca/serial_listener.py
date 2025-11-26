@@ -1,38 +1,38 @@
-import time
-import serial  # use 'serial', não 'from serial import Serial'
-from django.utils import timezone
-from apps.aluno.models import Aluno
-from apps.presenca.models import Presencas, PresencaAluno
+# import time
+# import serial  # use 'serial', não 'from serial import Serial'
+# from django.utils import timezone
+# from apps.aluno.models import Aluno
+# from apps.presenca.models import Presencas, PresencaAluno
 
-def iniciar_leitor_serial(porta="/dev/ttyUSB0", baudrate=9600):
-    print(f"🔌 Iniciando leitura da porta {porta}...")
-    arduino = serial.Serial(porta, baudrate, timeout=1)
-    time.sleep(2)
+# def iniciar_leitor_serial(porta="/dev/ttyUSB0", baudrate=9600):
+#     print(f"🔌 Iniciando leitura da porta {porta}...")
+#     arduino = serial.Serial(porta, baudrate, timeout=1)
+#     time.sleep(2)
 
-    while True:
-        if arduino.in_waiting > 0:
-            uid = arduino.readline().decode().strip()
-            if uid:
-                print(f"UID lido: {uid}")
-                registrar_presenca(uid)
-        time.sleep(1)
+#     while True:
+#         if arduino.in_waiting > 0:
+#             uid = arduino.readline().decode().strip()
+#             if uid:
+#                 print(f"UID lido: {uid}")
+#                 registrar_presenca(uid)
+#         time.sleep(1)
 
 
-def registrar_presenca(uid):
-    try:
-        aluno = Aluno.objects.get(uid=uid)
-    except Aluno.DoesNotExist:
-        print(f"❌ Aluno com UID {uid} não encontrado.")
-        return
+# def registrar_presenca(uid):
+#     try:
+#         aluno = Aluno.objects.get(uid=uid)
+#     except Aluno.DoesNotExist:
+#         print(f"❌ Aluno com UID {uid} não encontrado.")
+#         return
 
-    print(aluno)
-    # hoje = timezone.localdate()
-    # agora = timezone.localtime()
+#     print(aluno)
+#     # hoje = timezone.localdate()
+#     # agora = timezone.localtime()
 
-    # # Tenta pegar a presença do dia
-    # presenca, created = Presencas.objects.get_or_create(
-    #     data=hoje,
-    #     defaults={
+#     # # Tenta pegar a presença do dia
+#     # presenca, created = Presencas.objects.get_or_create(
+#     #     data=hoje,
+#     #     defaults={
     #         "horario_entrada": agora.time(),  # define horário de entrada se ainda não existir
     #         "horario_saida": None              # saída ainda não aconteceu
     #     }

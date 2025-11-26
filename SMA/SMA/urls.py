@@ -21,13 +21,11 @@ from django.views.generic import TemplateView # Importar TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apps.home.urls')),
+    # path('', include('apps.home.urls')),
     path('aluno/', include('apps.aluno.urls')),
     path('curso/', include('apps.curso.urls')),
     path('disciplina/', include('apps.disciplina.urls')),
-    path('horario/', include('apps.horario.urls')),
-    path('professor/', include('apps.professor.urls')),
-    path('presenca/', include('apps.presenca.urls')), # Incluir URLs do app presenca
+    path("presenca/", include("apps.presenca.urls")),
 
     # URLs de autenticação
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
@@ -36,6 +34,6 @@ urlpatterns = [
     # Dashboard
     path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
     path("professor/", include("apps.professor.urls")),
-    path("presencas/", include("apps.presencas.urls")),
-    path("horarios/", include("apps.horarios.urls")),
+    path("presencas/", include("apps.presenca.urls")),
+    path("horarios/", include("apps.horario.urls")),
 ]

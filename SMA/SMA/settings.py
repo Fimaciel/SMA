@@ -44,13 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap5', # Adicionado para integração com Bootstrap
     "apps.aluno",
     "apps.curso",
     "apps.disciplina",
     "apps.horario",
     "apps.presenca",
     "apps.professor",
+    "django_bootstrap5"
 ]
 
 MIDDLEWARE = [
