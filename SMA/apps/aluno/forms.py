@@ -11,5 +11,5 @@ class AlunoForm(forms.ModelForm):
             'matricula': forms.TextInput(attrs={'class': 'form-control'}),
             'periodo': forms.TextInput(attrs={'class': 'form-control'}),
             'uid': forms.TextInput(attrs={'class': 'form-control'}),
-            'data_nascimento': forms.DateInput(attrs={'type': 'date'}),
+            'data_nascimento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }

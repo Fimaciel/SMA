@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Excluir Aula{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4 text-gray-800">Confirmar Exclusão</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <p>Tem certeza que deseja excluir a aula da disciplina <strong>{{ object.disciplina.nome }}</strong> do dia <strong>{{ object.data|date:"d/m/Y" }}</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+            <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

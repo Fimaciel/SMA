@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import AlunoListView, AlunoCreateView, AlunoUpdateView, AlunoDeleteView
+from .views import (
+    AlunoListView,
+    AlunoCreateView,
+    AlunoUpdateView,
+    AlunoDeleteView
+)
 
 app_name = 'aluno'
 

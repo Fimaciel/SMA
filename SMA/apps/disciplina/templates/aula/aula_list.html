@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Gerenciar Aulas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Aulas</h1>
+    <a href="{% url 'disciplina:aula_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Agendar Aula
+    </a>
+</div>
+
+{% if aulas %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Professor</th>
+                    <th>Curso</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aula in aulas %}
+                <tr>
+                    <td>{{ aula.disciplina.nome }}</td>
+                    <td>{{ aula.professor }}</td>
+                    <td>{{ aula.curso }}</td>
+                    <td>{{ aula.data }}</td>
+                    <td>{{ aula.horario_inicio }} - {{ aula.horario_fim }}</td>
+                    <td>
+                        <a href="{% url 'disciplina:aula_edit' aula.pk %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'disciplina:aula_delete' aula.pk %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Nenhuma aula cadastrada.
+</div>
+{% endif %}
+{% endblock %}

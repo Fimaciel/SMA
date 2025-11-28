@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "apps.horario",
     "apps.presenca",
     "apps.professor",
-    "django_bootstrap5"
+    "django_bootstrap5",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

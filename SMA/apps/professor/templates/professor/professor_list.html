@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Gerenciar Professores{% endblock %}
 
@@ -20,7 +20,6 @@
                     <tr>
                         <th>Nome</th>
                         <th>CPF</th>
-                        <th>Matéria Principal</th>
                         <th>Disciplinas</th>
                         <th>Ações</th>
                     </tr>
@@ -30,14 +29,14 @@
                     <tr>
                         <td>{{ professor.nome }}</td>
                         <td>{{ professor.cpf }}</td>
-                        <td>{{ professor.materia }}</td>
-                        <td>
+                       <td>
                             {% for pd in professor.professordisciplina_set.all %}
                                 <span class="badge bg-secondary">{{ pd.disciplina.nome }}</span>
                             {% empty %}
-                                Nenhuma
+                                <span class="text-muted">Nenhuma</span>
                             {% endfor %}
                         </td>
+
                         <td>
                             <a href="{% url 'professor:professor_edit' professor.pk %}" class="btn btn-info btn-sm">
                                 <i class="fas fa-edit"></i> Editar

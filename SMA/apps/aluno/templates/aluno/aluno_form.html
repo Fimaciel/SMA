@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-{% if form.instance.pk %}Editar Aluno{% else %}Adicionar Aluno{% endif %}
+    {% if form.instance.pk %}Editar Aluno{% else %}Adicionar Aluno{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -12,6 +12,7 @@
             {% if form.instance.pk %}Editar Aluno{% else %}Adicionar Novo Aluno{% endif %}
         </h6>
     </div>
+
     <div class="card-body">
         <form method="post">
             {% csrf_token %}

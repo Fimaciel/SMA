@@ -36,4 +36,5 @@ urlpatterns = [
     path("professor/", include("apps.professor.urls")),
     path("presencas/", include("apps.presenca.urls")),
     path("horarios/", include("apps.horario.urls")),
+    
 ]

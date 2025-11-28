@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Confirmar Exclusão{% endblock %}
 
@@ -11,15 +11,13 @@
         <h6 class="m-0 font-weight-bold text-danger">Confirmar Exclusão</h6>
     </div>
     <div class="card-body">
-        <p>Você tem certeza que deseja excluir o curso <strong>{{ object.nome }}</strong>?</p>
+        <p>Tem certeza que deseja excluir o curso <strong>{{ object.nome }}</strong>?</p>
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">
                 <i class="fas fa-trash"></i> Sim, excluir
             </button>
-            <a href="{% url 'curso:curso_list' %}" class="btn btn-secondary">
-                Cancelar
-            </a>
+            <a href="{% url 'curso:curso_list' %}" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
 </div>

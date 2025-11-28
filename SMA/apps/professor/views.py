@@ -9,6 +9,7 @@ class ProfessorListView(ListView):
     context_object_name = 'professores'
     paginate_by = 10
 
+
 class ProfessorCreateView(CreateView):
     model = Professor
     form_class = ProfessorForm
@@ -17,12 +18,19 @@ class ProfessorCreateView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        disciplinas = form.cleaned_data.get('disciplinas')
-        if disciplinas:
-            self.object.professordisciplina_set.all().delete()
-            for disciplina in disciplinas:
-                ProfessorDisciplina.objects.create(professor=self.object, disciplina=disciplina)
+        self._save_disciplinas(form)
         return response
+
+    def _save_disciplinas(self, form):
+        disciplinas = form.cleaned_data.get('disciplinas')
+        self.object.professordisciplina_set.all().delete()
+        if disciplinas:
+            for disciplina in disciplinas:
+                ProfessorDisciplina.objects.create(
+                    professor=self.object,
+                    disciplina=disciplina
+                )
+
 
 class ProfessorUpdateView(UpdateView):
     model = Professor
@@ -32,17 +40,26 @@ class ProfessorUpdateView(UpdateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['disciplinas'] = self.object.professordisciplina_set.values_list('disciplina_id', flat=True)
+        initial['disciplinas'] = self.object.professordisciplina_set.values_list(
+            'disciplina_id', flat=True
+        )
         return initial
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        disciplinas = form.cleaned_data.get('disciplinas')
-        if disciplinas:
-            self.object.professordisciplina_set.all().delete()
-            for disciplina in disciplinas:
-                ProfessorDisciplina.objects.create(professor=self.object, disciplina=disciplina)
+        self._save_disciplinas(form)
         return response
+
+    def _save_disciplinas(self, form):
+        disciplinas = form.cleaned_data.get('disciplinas')
+        self.object.professordisciplina_set.all().delete()
+        if disciplinas:
+            for disciplina in disciplinas:
+                ProfessorDisciplina.objects.create(
+                    professor=self.object,
+                    disciplina=disciplina
+                )
+
 
 class ProfessorDeleteView(DeleteView):
     model = Professor

@@ -15,7 +15,7 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -26,6 +26,7 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for aluno in alunos %}
                     <tr>
@@ -50,9 +51,9 @@
     </div>
 </div>
 {% else %}
-<div class="alert alert-info" role="alert">
-    Nenhum aluno cadastrado. <a href="{% url 'aluno:aluno_add' %}" class="alert-link">Adicione um novo aluno agora!</a>
+<div class="alert alert-info">
+    Nenhum aluno cadastrado.  
+    <a href="{% url 'aluno:aluno_add' %}" class="alert-link">Adicionar agora</a>.
 </div>
 {% endif %}
-
 {% endblock %}
