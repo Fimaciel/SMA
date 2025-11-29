@@ -1,7 +1,5 @@
 from django.db import models
 
-from django.db import models
-
 class Disciplina(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True, null=True)
@@ -29,19 +27,9 @@ class Aula(models.Model):
         null=True,
         blank=True
     )
-
-    horario = models.ForeignKey(
-        "horario.Horarios",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
     data = models.DateField()
     horario_inicio = models.TimeField(null=True, blank=True)
     horario_fim = models.TimeField(null=True, blank=True)
-
-    alunos = models.ManyToManyField("aluno.Aluno", blank=True)
 
     def __str__(self):
         return f"{self.disciplina.nome} - {self.data}"

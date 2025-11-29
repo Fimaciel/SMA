@@ -7,6 +7,7 @@ from apps.horario.models import Horarios
 from apps.aluno.models import Aluno
 
 
+
 class DisciplinaForm(forms.ModelForm):
     class Meta:
         model = Disciplina
@@ -14,9 +15,8 @@ class DisciplinaForm(forms.ModelForm):
         widgets = {
             "nome": forms.TextInput(attrs={'class': 'form-control'}),
             "descricao": forms.Textarea(attrs={'class': 'form-control'}),
-            "alunos": forms.SelectMultiple(attrs={'class': 'form-control'}),
+            "alunos": forms.CheckboxSelectMultiple(),  
         }
-
         
 class AulaForm(forms.ModelForm):
     class Meta:
@@ -25,15 +25,12 @@ class AulaForm(forms.ModelForm):
             "disciplina",
             "professor",
             "curso",
-            "horario",
             "data",
             "horario_inicio",
             "horario_fim",
-            "alunos",
         ]
         widgets = {
             "data": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "horario_inicio": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
             "horario_fim": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
-            "alunos": forms.CheckboxSelectMultiple(),
         }

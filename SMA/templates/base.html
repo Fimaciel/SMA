@@ -8,6 +8,7 @@
     <title>{% block title %}Sistema de Gestão Acadêmica{% endblock %}</title>
     {% bootstrap_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> {# Font Awesome para ícones #}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
       body {
         display: flex;
@@ -33,6 +34,11 @@
         min-height: 100vh;
         transition: all 0.3s;
       }
+      .presente {
+          background-color: #c2f5c2 !important;
+          transition: 0.4s;
+      }
+
       .sidebar-header {
         padding: 20px;
         background: #212529;
@@ -105,9 +111,6 @@
                 <a href="{% url 'disciplina:disciplina_list' %}"><i class="fas fa-chalkboard-teacher"></i> Gerenciar Disciplinas</a>
             </li>
             <li>
-                <a href="{% url 'horario:horario_list' %}"><i class="fas fa-clock"></i> Gerenciar Horários</a>
-            </li>
-            <li>
                 <a href="{% url 'professor:professor_list' %}"><i class="fas fa-user-tie"></i> Gerenciar Professores</a>
             </li>
             <li>
@@ -167,4 +170,5 @@
         });
     </script>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </html>

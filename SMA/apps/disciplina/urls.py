@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DisciplinaListView, DisciplinaCreateView, DisciplinaUpdateView, DisciplinaDeleteView
+from .views import DisciplinaListView, DisciplinaCreateView, DisciplinaUpdateView, DisciplinaDeleteView, AulaView, presencas_json
 from .views import (
     AulaListView,
     AulaCreateView,
@@ -18,5 +18,6 @@ urlpatterns = [
     path("aulas/add/", AulaCreateView.as_view(), name="aula_add"),
     path("aulas/<int:pk>/edit/", AulaUpdateView.as_view(), name="aula_edit"),
     path("aulas/<int:pk>/delete/", AulaDeleteView.as_view(), name="aula_delete"),
-
+    path("aulas/<int:pk>/view/", AulaView.as_view(), name="aula_view"),
+    path("aula/<int:pk>/presencas-json/", presencas_json, name="presencas_json"),
 ]

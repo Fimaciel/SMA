@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Gerenciar Aula{% endblock %}
+
+{% block content %}
+
+<h1 class="h3 mb-4 text-gray-800">Gerenciar Aula</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+
+        <h4>{{ aula.disciplina.nome }}</h4>
+        <p><strong>Data:</strong> {{ aula.data }}</p>
+        <p><strong>Professor:</strong> {{ aula.professor }}</p>
+        <p><strong>Curso:</strong> {{ aula.curso }}</p>
+        <p><strong>Horário:</strong> {{ aula.horario_inicio }} – {{ aula.horario_fim }}</p>
+
+        <hr>
+
+        <div class="mb-3">
+            <h5>Tempo de Aula: <span id="timer">00:00:00</span></h5>
+        </div>
+
+        <script>
+            let seconds = 0;
+            setInterval(function () {
+                seconds++;
+                let h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                let m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                let s = String(seconds % 60).padStart(2, '0');
+                document.getElementById("timer").innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        </script>
+
+        <hr>
+
+        <h5>Presença dos Alunos</h5>
+
+        <table class="table table-bordered" id="tabela-presencas">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Presença</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                <tr id="aluno-row-{{ aluno.id }}">
+                    <td>{{ aluno.nome }}</td>
+                    <td class="presenca-status">❌</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-danger" onclick="confirmarEncerramentoBonito()">
+            Encerrar Aula
+        </button>
+        <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">Voltar</a>
+
+    </div>
+</div>
+
+<script>
+    function confirmarEncerramentoBonito() {
+        Swal.fire({
+            title: "Encerrar aula?",
+            text: "Após encerrar, a lista de presença será registrada.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim, encerrar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector("form")?.submit();
+            }
+        });
+    }
+</script>
+
+<script>
+    function atualizarPresencas() {
+        fetch("{% url 'disciplina:presencas_json' aula.id %}")
+            .then(response => response.json())
+            .then(data => {
+                data.presencas.forEach(p => {
+                    const row = document.getElementById(`aluno-row-${p.aluno_id}`);
+
+                    if (row) {
+                        const cell = row.querySelector(".presenca-status");
+
+                        if (p.presente) {
+                            cell.innerHTML = "✅";
+                            row.classList.add("presente");
+                        } else {
+                            cell.innerHTML = "❌";
+                            row.classList.remove("presente");
+                        }
+                    }
+                });
+            });
+    }
+
+    setInterval(atualizarPresencas, 3000);
+    atualizarPresencas();
+</script>
+
+{% endblock %}
+
+

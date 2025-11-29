@@ -12,7 +12,22 @@
     <div class="card-body">
         <form method="post">
             {% csrf_token %}
-            {% bootstrap_form form %}
+            <div class="mb-3">
+                {{ form.nome.label_tag }}
+                {{ form.nome }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.descricao.label_tag }}
+                {{ form.descricao }}
+            </div>
+
+            <div class="mb-3">
+                <label>Alunos</label>
+                <div class="ms-3">
+                    {{ form.alunos }}
+                </div>
+            </div>
             <button class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
             <a href="{% url 'disciplina:disciplina_list' %}" class="btn btn-secondary">Cancelar</a>
         </form>
