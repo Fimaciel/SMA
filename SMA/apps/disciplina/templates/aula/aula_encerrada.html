@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Aula Encerrada</h2>
+
+<p><strong>Disciplina:</strong> {{ aula.disciplina.nome }}</p>
+<p><strong>Data:</strong> {{ aula.data }}</p>
+
+<h4>Presenças Registradas</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Aluno</th>
+            <th>Presente</th>
+            <th>Tempo total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in presencas %}
+        <tr>
+            <td>{{ p.nome }}</td>
+            <td class="text-center">
+                {% if p.presente %}
+                    ✔️
+                {% else %}
+                    ❌
+                {% endif %}
+            </td>
+            <td>{{p.tempo_total}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'disciplina:aula_list' %}" class="btn btn-primary">Voltar</a>
+
+{% endblock %}

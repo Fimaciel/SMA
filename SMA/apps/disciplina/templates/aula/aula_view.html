@@ -19,19 +19,9 @@
         <hr>
 
         <div class="mb-3">
-            <h5>Tempo de Aula: <span id="timer">00:00:00</span></h5>
+            <h5>Tempo de Aula: <span id="contador_aula">00:00:00</span></h5>
         </div>
 
-        <script>
-            let seconds = 0;
-            setInterval(function () {
-                seconds++;
-                let h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-                let m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-                let s = String(seconds % 60).padStart(2, '0');
-                document.getElementById("timer").innerText = `${h}:${m}:${s}`;
-            }, 1000);
-        </script>
 
         <hr>
 
@@ -57,10 +47,12 @@
         <button type="button" class="btn btn-danger" onclick="confirmarEncerramentoBonito()">
             Encerrar Aula
         </button>
+
         <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">Voltar</a>
 
     </div>
 </div>
+
 
 <script>
     function confirmarEncerramentoBonito() {
@@ -73,11 +65,43 @@
             cancelButtonText: "Cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                document.querySelector("form")?.submit();
+                encerrarAula();
             }
         });
     }
 </script>
+
+<script>
+function encerrarAula() {
+
+    const tempoDecorrido = localStorage.getItem("contador_aula") || 0;
+
+    fetch("{% url 'disciplina:encerrar_aula' aula.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            tempo_decorrido: parseInt(tempoDecorrido)
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.aula_encerrada) {
+            Swal.fire({
+                icon: "success",
+                title: "Aula encerrada!",
+                text: "Presenças registradas com sucesso."
+            }).then(() => {
+                localStorage.removeItem("contador_aula");
+                window.location.href = "{% url 'disciplina:aula_encerrada' aula.id %}";
+            });
+        }
+    });
+}
+</script>
+
 
 <script>
     function atualizarPresencas() {
@@ -106,6 +130,40 @@
     atualizarPresencas();
 </script>
 
+
+<script>
+    const horaFim = "{{ aula.horario_fim|default:'' }}";
+    const dataAula = "{{ aula.data|date:'Y-m-d' }}";
+
+    if (horaFim) {
+        const fimTimestamp = new Date(`${dataAula}T${horaFim}`);
+
+        setInterval(() => {
+            const agora = new Date();
+            if (agora >= fimTimestamp) {
+                encerrarAula();
+            }
+        }, 5000); 
+    }
+</script>
+
+<script>
+let seconds = parseInt(localStorage.getItem("contador_aula")) || 0;
+
+    function atualizarContador() {
+        seconds++;
+        localStorage.setItem("contador_aula", seconds);
+
+        let h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        let m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        let s = String(seconds % 60).padStart(2, '0');
+
+        document.getElementById("contador_aula").innerText = `${h}:${m}:${s}`;
+    }
+
+    setInterval(atualizarContador, 1000);
+    atualizarContador();
+</script>
+
+
 {% endblock %}
-
-

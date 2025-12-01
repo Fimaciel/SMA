@@ -30,6 +30,9 @@ class Aula(models.Model):
     data = models.DateField()
     horario_inicio = models.TimeField(null=True, blank=True)
     horario_fim = models.TimeField(null=True, blank=True)
+    tempo_total = models.IntegerField(default=0)
+    
+    encerrada = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.disciplina.nome} - {self.data}"
