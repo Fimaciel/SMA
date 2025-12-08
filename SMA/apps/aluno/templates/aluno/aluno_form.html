@@ -2,24 +2,290 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-    {% if form.instance.pk %}Editar Aluno{% else %}Adicionar Aluno{% endif %}
+{% if form.instance.pk %}Editar Aluno{% else %}Novo Aluno{% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">
-            {% if form.instance.pk %}Editar Aluno{% else %}Adicionar Novo Aluno{% endif %}
-        </h6>
-    </div>
+<style>
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: none;
+        overflow: hidden;
+    }
+    .form-header {
+        background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+        color: white;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    .form-header h4 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.75rem;
+        position: relative;
+        z-index: 1;
+    }
+    .form-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    .form-body {
+        padding: 2.5rem;
+    }
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+    }
+    .form-section-title i {
+        margin-right: 0.75rem;
+        font-size: 1.25rem;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+    .form-text {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f3f4f6;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    }
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-secondary:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+    .required-indicator {
+        color: #ef4444;
+        margin-left: 0.25rem;
+    }
+</style>
 
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary">Salvar</button>
-            <a href="{% url 'aluno:aluno_list' %}" class="btn btn-secondary">Cancelar</a>
-        </form>
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h4>
+                <i class="fas fa-user-graduate me-2"></i>
+                {% if form.instance.pk %}Editar Aluno{% else %}Cadastrar Novo Aluno{% endif %}
+            </h4>
+            <p>Preencha os dados do aluno com atenção</p>
+        </div>
+
+        <div class="form-body">
+            <form method="post" id="alunoForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-user"></i>
+                        Dados Pessoais
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Nome Completo<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.nome }}
+                                <small class="form-text">Digite o nome completo do aluno</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    CPF<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.cpf }}
+                                <small class="form-text">Formato: 000.000.000-00</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Data de Nascimento<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.data_nascimento }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-id-card"></i>
+                        Dados Acadêmicos
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Matrícula<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.matricula }}
+                                <small class="form-text">Número único de identificação</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Período<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.periodo }}
+                                <small class="form-text">Ex: 1º Período, 2º Período</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-id-badge"></i>
+                        Identificação RFID
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    UID RFID<span class="required-indicator">*</span>
+                                </label>
+                                {{ form.uid }}
+                                <small class="form-text">Código único do cartão RFID</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        {% if form.instance.pk %}Atualizar{% else %}Cadastrar{% endif %}
+                    </button>
+                    <a href="{% url 'aluno:aluno_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Máscara para CPF
+    const cpfInput = document.querySelector('input[name="cpf"]');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+
+    // Validação do formulário
+    const form = document.getElementById('alunoForm');
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Campos obrigatórios',
+                text: 'Por favor, preencha todos os campos obrigatórios.',
+                confirmButtonColor: '#2563eb'
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

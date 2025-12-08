@@ -1,22 +1,49 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 
-{% block title %}Excluir Aula{% endblock %}
+{% block title %}Confirmar Exclusão{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4 text-gray-800">Confirmar Exclusão</h1>
+<style>
+    .delete-container { max-width: 600px; margin: 0 auto; }
+    .delete-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); border: none; overflow: hidden; animation: fadeInUp 0.5s ease; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .delete-header { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 2rem; text-align: center; }
+    .delete-header i { font-size: 3rem; margin-bottom: 1rem; }
+    .delete-header h4 { margin: 0; font-weight: 700; font-size: 1.5rem; }
+    .delete-body { padding: 2rem; text-align: center; }
+    .delete-body p { font-size: 1.1rem; color: #374151; margin-bottom: 1.5rem; }
+    .delete-body strong { color: #dc2626; }
+    .delete-actions { display: flex; gap: 1rem; justify-content: center; padding-top: 1rem; }
+    .btn-danger { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; padding: 0.875rem 2rem; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: white; }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3); }
+    .btn-secondary { background: #f3f4f6; color: #374151; border: none; padding: 0.875rem 2rem; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; }
+    .btn-secondary:hover { background: #e5e7eb; color: #1f2937; }
+</style>
 
-<div class="card shadow mb-4">
-    <div class="card-body">
-        <p>Tem certeza que deseja excluir a aula da disciplina <strong>{{ object.disciplina.nome }}</strong> do dia <strong>{{ object.data|date:"d/m/Y" }}</strong>?</p>
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h4>Confirmar Exclusão</h4>
+        </div>
 
-        <form method="post">
-            {% csrf_token %}
-            <button class="btn btn-danger">
-                <i class="fas fa-trash"></i> Excluir
-            </button>
-            <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">Cancelar</a>
-        </form>
+        <div class="delete-body">
+            <p>Tem certeza que deseja excluir a aula da disciplina <strong>{{ object.disciplina.nome }}</strong> do dia <strong>{{ object.data|date:"d/m/Y" }}</strong>?</p>
+            <p class="text-muted">Esta ação não pode ser desfeita.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Excluir
+                    </button>
+                    <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

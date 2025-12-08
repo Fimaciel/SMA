@@ -1,38 +1,119 @@
 {% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Aula Encerrada{% endblock %}
+
 {% block content %}
+<style>
+    .encerrada-container { max-width: 1000px; margin: 0 auto; }
+    .encerrada-header { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(107, 114, 128, 0.2); text-align: center; }
+    .encerrada-header i { font-size: 3rem; margin-bottom: 1rem; }
+    .encerrada-header h1 { font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; }
+    .encerrada-header p { opacity: 0.9; margin: 0; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .info-card { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); text-align: center; }
+    .info-card i { font-size: 2rem; color: #06b6d4; margin-bottom: 0.5rem; }
+    .info-card strong { display: block; color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .info-card span { font-size: 1.25rem; font-weight: 700; color: #1f2937; }
+    .presenca-card { background: white; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .presenca-card h4 { font-weight: 700; color: #1f2937; margin-bottom: 1.5rem; }
+    .presenca-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; }
+    .presenca-table thead th { background: #f9fafb; padding: 1rem; font-weight: 600; color: #4b5563; text-transform: uppercase; font-size: 0.85rem; border: none; }
+    .presenca-table tbody tr { background: #f9fafb; transition: all 0.3s ease; }
+    .presenca-table tbody tr.presente { background: #d1fae5; }
+    .presenca-table tbody tr.ausente { background: #fee2e2; }
+    .presenca-table tbody td { padding: 1rem; border: none; }
+    .presenca-table tbody tr td:first-child { border-radius: 10px 0 0 10px; }
+    .presenca-table tbody tr td:last-child { border-radius: 0 10px 10px 0; text-align: center; }
+    .status-badge { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+    .status-presente { background: #d1fae5; color: #065f46; }
+    .status-ausente { background: #fee2e2; color: #dc2626; }
+    .btn-voltar { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; display: inline-block; }
+    .btn-voltar:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3); color: white; }
+    .stats-summary { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .stat-box { flex: 1; background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); text-align: center; }
+    .stat-box .number { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .stat-box .number.green { color: #059669; }
+    .stat-box .number.red { color: #dc2626; }
+    .stat-box .label { color: #6b7280; font-size: 0.9rem; }
+</style>
 
-<h2>Aula Encerrada</h2>
+<div class="encerrada-container">
+    <div class="encerrada-header">
+        <i class="fas fa-check-circle"></i>
+        <h1>Aula Encerrada</h1>
+        <p>Presenças registradas com sucesso</p>
+    </div>
 
-<p><strong>Disciplina:</strong> {{ aula.disciplina.nome }}</p>
-<p><strong>Data:</strong> {{ aula.data }}</p>
+    <div class="info-grid">
+        <div class="info-card">
+            <i class="fas fa-book-open"></i>
+            <strong>Disciplina</strong>
+            <span>{{ aula.disciplina.nome }}</span>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-calendar-alt"></i>
+            <strong>Data</strong>
+            <span>{{ aula.data|date:"d/m/Y" }}</span>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-user-tie"></i>
+            <strong>Professor</strong>
+            <span>{{ aula.professor.nome }}</span>
+        </div>
+    </div>
 
-<h4>Presenças Registradas</h4>
+    <div class="stats-summary">
+        <div class="stat-box">
+            <div class="number green">{{ presencas|length }}</div>
+            <div class="label">Total de Alunos</div>
+        </div>
+        <div class="stat-box">
+            <div class="number green">{{ total_presentes }}</div>
+            <div class="label">Presentes</div>
+        </div>
+        <div class="stat-box">
+            <div class="number red">{{ total_ausentes }}</div>
+            <div class="label">Ausentes</div>
+        </div>
+    </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Aluno</th>
-            <th>Presente</th>
-            <th>Tempo total</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in presencas %}
-        <tr>
-            <td>{{ p.nome }}</td>
-            <td class="text-center">
-                {% if p.presente %}
-                    ✔️
-                {% else %}
-                    ❌
-                {% endif %}
-            </td>
-            <td>{{p.tempo_total}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="presenca-card">
+        <h4><i class="fas fa-list-check me-2"></i>Presenças Registradas</h4>
+        <table class="presenca-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user me-2"></i>Aluno</th>
+                    <th style="text-align: center;"><i class="fas fa-clock me-2"></i>Tempo Total</th>
+                    <th style="text-align: center;"><i class="fas fa-check-circle me-2"></i>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in presencas %}
+                <tr class="{% if p.presente %}presente{% else %}ausente{% endif %}">
+                    <td><strong>{{ p.nome }}</strong></td>
+                    <td style="text-align: center; font-family: 'Courier New', monospace; font-weight: 600;">{{ p.tempo_total }}</td>
+                    <td>
+                        {% if p.presente %}
+                            <span class="status-badge status-presente">
+                                <i class="fas fa-check-circle me-1"></i>Presente
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-ausente">
+                                <i class="fas fa-times-circle me-1"></i>Ausente
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<a href="{% url 'disciplina:aula_list' %}" class="btn btn-primary">Voltar</a>
-
+    <div style="text-align: center;">
+        <a href="{% url 'disciplina:aula_list' %}" class="btn btn-voltar">
+            <i class="fas fa-arrow-left me-2"></i>Voltar para Aulas
+        </a>
+    </div>
+</div>
 {% endblock %}

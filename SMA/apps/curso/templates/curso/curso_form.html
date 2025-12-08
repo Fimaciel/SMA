@@ -1,24 +1,66 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 
-{% block title %}{% if object %}Editar Curso{% else %}Adicionar Curso{% endif %}{% endblock %}
+{% block title %}
+{% if form.instance.pk %}Editar Curso{% else %}Novo Curso{% endif %}
+{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4 text-gray-800">
-    {% if object %}Editar Curso{% else %}Adicionar Curso{% endif %}
-</h1>
+<style>
+    .form-container { max-width: 800px; margin: 0 auto; }
+    .form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); border: none; overflow: hidden; animation: fadeInUp 0.5s ease; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .form-header { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; padding: 2rem; position: relative; overflow: hidden; }
+    .form-header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
+    .form-header h4 { margin: 0; font-weight: 700; font-size: 1.75rem; position: relative; z-index: 1; }
+    .form-header p { margin: 0.5rem 0 0 0; opacity: 0.9; position: relative; z-index: 1; }
+    .form-body { padding: 2.5rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-label { font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.95rem; display: block; }
+    .form-control, .form-select { border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.95rem; transition: all 0.3s ease; width: 100%; }
+    .form-control:focus, .form-select:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+    .form-text { font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem; display: block; }
+    .form-actions { display: flex; gap: 1rem; padding-top: 2rem; border-top: 2px solid #f3f4f6; }
+    .btn-primary { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); border: none; padding: 0.875rem 2rem; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+    .btn-secondary { background: #f3f4f6; color: #374151; border: none; padding: 0.875rem 2rem; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; }
+    .btn-secondary:hover { background: #e5e7eb; color: #1f2937; }
+    .required-indicator { color: #ef4444; margin-left: 0.25rem; }
+</style>
 
-<div class="card shadow mb-4">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i>
-                {% if object %}Salvar Alterações{% else %}Salvar{% endif %}
-            </button>
-            <a href="{% url 'curso:curso_list' %}" class="btn btn-secondary">Cancelar</a>
-        </form>
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h4><i class="fas fa-book-open me-2"></i>{% if form.instance.pk %}Editar Curso{% else %}Cadastrar Novo Curso{% endif %}</h4>
+            <p>Preencha as informações do curso</p>
+        </div>
+
+        <div class="form-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Nome do Curso<span class="required-indicator">*</span></label>
+                    {{ form.nome }}
+                    <small class="form-text">Digite o nome completo do curso</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Carga Horária<span class="required-indicator">*</span></label>
+                    {{ form.quantidade_horas }}
+                    <small class="form-text">Total de horas do curso</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{% if form.instance.pk %}Atualizar{% else %}Cadastrar{% endif %}
+                    </button>
+                    <a href="{% url 'curso:curso_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

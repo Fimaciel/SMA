@@ -4,76 +4,110 @@
 {% block title %}Gerenciar Aula{% endblock %}
 
 {% block content %}
+<style>
+    .aula-container { max-width: 1200px; margin: 0 auto; }
+    .aula-header { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; padding: 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2); }
+    .aula-header h1 { font-weight: 700; font-size: 2rem; margin-bottom: 1rem; }
+    .aula-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .info-item { background: rgba(255, 255, 255, 0.15); padding: 1rem; border-radius: 12px; backdrop-filter: blur(10px); }
+    .info-item strong { display: block; font-size: 0.85rem; opacity: 0.9; margin-bottom: 0.25rem; }
+    .info-item span { font-size: 1.1rem; font-weight: 600; }
+    .timer-card { background: white; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); text-align: center; }
+    .timer-display { font-size: 4rem; font-weight: 700; color: #06b6d4; font-family: 'Courier New', monospace; margin: 1rem 0; }
+    .presenca-card { background: white; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .presenca-card h5 { font-weight: 700; color: #1f2937; margin-bottom: 1.5rem; }
+    .presenca-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; }
+    .presenca-table thead th { background: #f9fafb; padding: 1rem; font-weight: 600; color: #4b5563; text-transform: uppercase; font-size: 0.85rem; border: none; }
+    .presenca-table tbody tr { background: #f9fafb; transition: all 0.3s ease; }
+    .presenca-table tbody tr.presente { background: #d1fae5; }
+    .presenca-table tbody td { padding: 1rem; border: none; }
+    .presenca-table tbody tr td:first-child { border-radius: 10px 0 0 10px; }
+    .presenca-table tbody tr td:last-child { border-radius: 0 10px 10px 0; text-align: center; }
+    .status-icon { font-size: 1.5rem; }
+    .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
+    .btn-encerrar { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; font-size: 1.1rem; transition: all 0.3s ease; }
+    .btn-encerrar:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3); }
+    .btn-voltar { background: #f3f4f6; color: #374151; border: none; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; }
+    .btn-voltar:hover { background: #e5e7eb; }
+</style>
 
-<h1 class="h3 mb-4 text-gray-800">Gerenciar Aula</h1>
-
-<div class="card shadow mb-4">
-    <div class="card-body">
-
-        <h4>{{ aula.disciplina.nome }}</h4>
-        <p><strong>Data:</strong> {{ aula.data }}</p>
-        <p><strong>Professor:</strong> {{ aula.professor }}</p>
-        <p><strong>Curso:</strong> {{ aula.curso }}</p>
-        <p><strong>Horário:</strong> {{ aula.horario_inicio }} – {{ aula.horario_fim }}</p>
-
-        <hr>
-
-        <div class="mb-3">
-            <h5>Tempo de Aula: <span id="contador_aula">00:00:00</span></h5>
+<div class="aula-container">
+    <div class="aula-header">
+        <h1><i class="fas fa-chalkboard me-2"></i>{{ aula.disciplina.nome }}</h1>
+        <div class="aula-info">
+            <div class="info-item">
+                <strong><i class="fas fa-calendar-alt me-1"></i>Data</strong>
+                <span>{{ aula.data|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-user-tie me-1"></i>Professor</strong>
+                <span>{{ aula.professor.nome }}</span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-graduation-cap me-1"></i>Curso</strong>
+                <span>{{ aula.curso.nome }}</span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-clock me-1"></i>Horário</strong>
+                <span>{{ aula.horario_inicio|time:"H:i" }} – {{ aula.horario_fim|time:"H:i" }}</span>
+            </div>
         </div>
+    </div>
 
+    <div class="timer-card">
+        <h5 style="color: #6b7280; margin-bottom: 1rem;"><i class="fas fa-stopwatch me-2"></i>Tempo de Aula</h5>
+        <div class="timer-display" id="contador_aula">00:00:00</div>
+        <p style="color: #9ca3af; margin: 0;">Aula em andamento</p>
+    </div>
 
-        <hr>
-
-        <h5>Presença dos Alunos</h5>
-
-        <table class="table table-bordered" id="tabela-presencas">
+    <div class="presenca-card">
+        <h5><i class="fas fa-users me-2"></i>Presença dos Alunos</h5>
+        <table class="presenca-table" id="tabela-presencas">
             <thead>
                 <tr>
-                    <th>Aluno</th>
-                    <th>Presença</th>
+                    <th><i class="fas fa-user me-2"></i>Aluno</th>
+                    <th style="text-align: center;"><i class="fas fa-check-circle me-2"></i>Presença</th>
                 </tr>
             </thead>
             <tbody>
                 {% for aluno in alunos %}
                 <tr id="aluno-row-{{ aluno.id }}">
-                    <td>{{ aluno.nome }}</td>
-                    <td class="presenca-status">❌</td>
+                    <td><strong>{{ aluno.nome }}</strong></td>
+                    <td class="presenca-status"><span class="status-icon">❌</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
 
-        <button type="button" class="btn btn-danger" onclick="confirmarEncerramentoBonito()">
-            Encerrar Aula
+    <div class="action-buttons">
+        <button type="button" class="btn btn-encerrar" onclick="confirmarEncerramentoBonito()">
+            <i class="fas fa-stop-circle me-2"></i>Encerrar Aula
         </button>
-
-        <a href="{% url 'disciplina:aula_list' %}" class="btn btn-secondary">Voltar</a>
-
+        <a href="{% url 'disciplina:aula_list' %}" class="btn btn-voltar">
+            <i class="fas fa-arrow-left me-2"></i>Voltar
+        </a>
     </div>
 </div>
 
-
 <script>
-    function confirmarEncerramentoBonito() {
-        Swal.fire({
-            title: "Encerrar aula?",
-            text: "Após encerrar, a lista de presença será registrada.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sim, encerrar",
-            cancelButtonText: "Cancelar"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                encerrarAula();
-            }
-        });
-    }
-</script>
+function confirmarEncerramentoBonito() {
+    Swal.fire({
+        title: "Encerrar aula?",
+        text: "Após encerrar, a lista de presença será registrada.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sim, encerrar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#dc2626"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            encerrarAula();
+        }
+    });
+}
 
-<script>
 function encerrarAula() {
-
     const tempoDecorrido = localStorage.getItem("contador_aula") || 0;
 
     fetch("{% url 'disciplina:encerrar_aula' aula.id %}", {
@@ -92,7 +126,8 @@ function encerrarAula() {
             Swal.fire({
                 icon: "success",
                 title: "Aula encerrada!",
-                text: "Presenças registradas com sucesso."
+                text: "Presenças registradas com sucesso.",
+                confirmButtonColor: "#06b6d4"
             }).then(() => {
                 localStorage.removeItem("contador_aula");
                 window.location.href = "{% url 'disciplina:aula_encerrada' aula.id %}";
@@ -100,70 +135,57 @@ function encerrarAula() {
         }
     });
 }
-</script>
 
-
-<script>
-    function atualizarPresencas() {
-        fetch("{% url 'disciplina:presencas_json' aula.id %}")
-            .then(response => response.json())
-            .then(data => {
-                data.presencas.forEach(p => {
-                    const row = document.getElementById(`aluno-row-${p.aluno_id}`);
-
-                    if (row) {
-                        const cell = row.querySelector(".presenca-status");
-
-                        if (p.presente) {
-                            cell.innerHTML = "✅";
-                            row.classList.add("presente");
-                        } else {
-                            cell.innerHTML = "❌";
-                            row.classList.remove("presente");
-                        }
+function atualizarPresencas() {
+    fetch("{% url 'disciplina:presencas_json' aula.id %}")
+        .then(response => response.json())
+        .then(data => {
+            data.presencas.forEach(p => {
+                const row = document.getElementById(`aluno-row-${p.aluno_id}`);
+                if (row) {
+                    const cell = row.querySelector(".presenca-status");
+                    if (p.presente) {
+                        cell.innerHTML = '<span class="status-icon">✅</span>';
+                        row.classList.add("presente");
+                    } else {
+                        cell.innerHTML = '<span class="status-icon">❌</span>';
+                        row.classList.remove("presente");
                     }
-                });
+                }
             });
-    }
+        });
+}
 
-    setInterval(atualizarPresencas, 3000);
-    atualizarPresencas();
-</script>
+setInterval(atualizarPresencas, 3000);
+atualizarPresencas();
 
+const horaFim = "{{ aula.horario_fim|default:'' }}";
+const dataAula = "{{ aula.data|date:'Y-m-d' }}";
 
-<script>
-    const horaFim = "{{ aula.horario_fim|default:'' }}";
-    const dataAula = "{{ aula.data|date:'Y-m-d' }}";
+if (horaFim) {
+    const fimTimestamp = new Date(`${dataAula}T${horaFim}`);
+    setInterval(() => {
+        const agora = new Date();
+        if (agora >= fimTimestamp) {
+            encerrarAula();
+        }
+    }, 5000);
+}
 
-    if (horaFim) {
-        const fimTimestamp = new Date(`${dataAula}T${horaFim}`);
-
-        setInterval(() => {
-            const agora = new Date();
-            if (agora >= fimTimestamp) {
-                encerrarAula();
-            }
-        }, 5000); 
-    }
-</script>
-
-<script>
 let seconds = parseInt(localStorage.getItem("contador_aula")) || 0;
 
-    function atualizarContador() {
-        seconds++;
-        localStorage.setItem("contador_aula", seconds);
+function atualizarContador() {
+    seconds++;
+    localStorage.setItem("contador_aula", seconds);
 
-        let h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        let m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        let s = String(seconds % 60).padStart(2, '0');
+    let h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    let m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    let s = String(seconds % 60).padStart(2, '0');
 
-        document.getElementById("contador_aula").innerText = `${h}:${m}:${s}`;
-    }
+    document.getElementById("contador_aula").innerText = `${h}:${m}:${s}`;
+}
 
-    setInterval(atualizarContador, 1000);
-    atualizarContador();
+setInterval(atualizarContador, 1000);
+atualizarContador();
 </script>
-
-
 {% endblock %}

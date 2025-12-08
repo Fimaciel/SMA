@@ -87,6 +87,8 @@ class AulaEncerradaView(DetailView):
         presencas = PresencaAluno.objects.filter(aula=aula).select_related("aluno")
 
         lista_alunos = []
+        total_presentes = 0
+        total_ausentes = 0
 
         for p in presencas:
             # tempo total formatado
@@ -101,8 +103,15 @@ class AulaEncerradaView(DetailView):
                 "presente": p.presente,
                 "tempo_total": tempo_formatado,
             })
+            
+            if p.presente:
+                total_presentes += 1
+            else:
+                total_ausentes += 1
 
         context["presencas"] = lista_alunos
+        context["total_presentes"] = total_presentes
+        context["total_ausentes"] = total_ausentes
 
         return context
 

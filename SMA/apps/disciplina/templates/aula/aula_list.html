@@ -4,61 +4,163 @@
 {% block title %}Gerenciar Aulas{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Aulas</h1>
-    <a href="{% url 'disciplina:aula_add' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Agendar Aula
-    </a>
+<style>
+    .page-header { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; padding: 2.5rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2); }
+    .page-header h1 { font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; }
+    .page-header p { opacity: 0.9; margin: 0; }
+    .btn-add { background: white; color: #1e40af; border: none; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); color: #1e40af; }
+    .search-bar { background: white; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .search-input { border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.95rem; transition: all 0.3s ease; }
+    .search-input:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .item-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); transition: all 0.3s ease; border: 2px solid transparent; }
+    .item-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); border-color: #2563eb; }
+    .item-header { display: flex; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #f3f4f6; }
+    .item-icon { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white; margin-right: 1rem; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); }
+    .item-info h5 { margin: 0; font-weight: 700; color: #1f2937; font-size: 1.1rem; }
+    .item-info small { color: #6b7280; font-size: 0.85rem; }
+    .item-details { margin-bottom: 1rem; }
+    .detail-item { display: flex; align-items: center; padding: 0.5rem 0; color: #4b5563; font-size: 0.9rem; }
+    .detail-item i { width: 24px; color: #2563eb; margin-right: 0.75rem; }
+    .detail-item strong { margin-right: 0.5rem; color: #1f2937; }
+    .item-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f3f4f6; }
+    .btn-action { flex: 1; padding: 0.625rem; border-radius: 10px; font-weight: 600; font-size: 0.875rem; transition: all 0.3s ease; border: none; }
+    .btn-manage { background: #d1fae5; color: #065f46; }
+    .btn-manage:hover { background: #a7f3d0; transform: translateY(-2px); }
+    .btn-edit { background: #eff6ff; color: #1e40af; }
+    .btn-edit:hover { background: #dbeafe; transform: translateY(-2px); }
+    .btn-delete { background: #fef2f2; color: #dc2626; }
+    .btn-delete:hover { background: #fee2e2; transform: translateY(-2px); }
+    .btn-view { background: #f3f4f6; color: #4b5563; }
+    .btn-view:hover { background: #e5e7eb; transform: translateY(-2px); }
+    .empty-state { text-align: center; padding: 4rem 2rem; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .empty-state i { font-size: 5rem; color: #e5e7eb; margin-bottom: 1.5rem; }
+    .empty-state h4 { color: #6b7280; margin-bottom: 1rem; }
+    .stats-bar { background: white; border-radius: 15px; padding: 1rem 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; }
+    .stat-item { display: flex; align-items: center; gap: 0.75rem; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .stat-icon.cyan { background: #cffafe; color: #06b6d4; }
+    .status-badge { display: inline-flex; align-items: center; padding: 0.4rem 0.875rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .status-ativa { background: #d1fae5; color: #065f46; }
+    .status-encerrada { background: #f3f4f6; color: #6b7280; }
+    @media (max-width: 768px) { .items-grid { grid-template-columns: 1fr; } .page-header { padding: 1.5rem; } }
+</style>
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h1><i class="fas fa-chalkboard me-2"></i>Gerenciar Aulas</h1>
+            <p>Agende e monitore as aulas do sistema</p>
+        </div>
+        <a href="{% url 'disciplina:aula_add' %}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Agendar Aula
+        </a>
+    </div>
 </div>
 
 {% if aulas %}
-<div class="card shadow mb-4">
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Disciplina</th>
-                    <th>Professor</th>
-                    <th>Curso</th>
-                    <th>Data</th>
-                    <th>Horário</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for aula in aulas %}
-                <tr>
-                    <td>{{ aula.disciplina.nome }}</td>
-                    <td>{{ aula.professor }}</td>
-                    <td>{{ aula.curso }}</td>
-                    <td>{{ aula.data }}</td>
-                    <td>{{ aula.horario_inicio }} - {{ aula.horario_fim }}</td>
-                    <td>
-                        <a href="{% url 'disciplina:aula_edit' aula.pk %}" class="btn btn-info btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <a href="{% url 'disciplina:aula_delete' aula.pk %}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i> Excluir
-                        </a>
-                        {% if aula.encerrada %}
-                            <a href="{% url 'disciplina:aula_encerrada' aula.pk %}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-eye"></i> Ver Detalhes
-                            </a>
-                        {% else %}
-                            <a href="{% url 'disciplina:aula_view' aula.pk %}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-eye"></i> Gerenciar
-                            </a>
-                        {% endif %}
-                    </td>   
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="stat-icon cyan">
+            <i class="fas fa-chalkboard"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.85rem; color: #6b7280;">Total de Aulas</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;">{{ aulas|length }}</div>
+        </div>
     </div>
 </div>
+
+<div class="search-bar">
+    <div class="input-group">
+        <span class="input-group-text" style="background: #f9fafb; border: 2px solid #e5e7eb; border-right: none; border-radius: 12px 0 0 12px;">
+            <i class="fas fa-search" style="color: #6b7280;"></i>
+        </span>
+        <input type="text" class="form-control search-input" id="searchInput" placeholder="Buscar por disciplina, professor, curso..." style="border-left: none;">
+    </div>
+</div>
+
+<div class="items-grid">
+    {% for aula in aulas %}
+    <div class="item-card" data-search="{{ aula.disciplina.nome|lower }} {{ aula.professor.nome|lower }} {{ aula.curso.nome|lower }}">
+        <div class="item-header">
+            <div class="item-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="item-info">
+                <h5>{{ aula.disciplina.nome }}</h5>
+                <small><i class="fas fa-calendar-alt me-1"></i>{{ aula.data|date:"d/m/Y" }}</small>
+            </div>
+        </div>
+        
+        <div class="item-details">
+            <div class="detail-item">
+                <i class="fas fa-user-tie"></i>
+                <strong>Professor:</strong> {{ aula.professor.nome }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-graduation-cap"></i>
+                <strong>Curso:</strong> {{ aula.curso.nome }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock"></i>
+                <strong>Horário:</strong> {{ aula.horario_inicio|time:"H:i" }} - {{ aula.horario_fim|time:"H:i" }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-info-circle"></i>
+                <strong>Status:</strong>
+                {% if aula.encerrada %}
+                    <span class="status-badge status-encerrada">
+                        <i class="fas fa-check-circle me-1"></i>Encerrada
+                    </span>
+                {% else %}
+                    <span class="status-badge status-ativa">
+                        <i class="fas fa-play-circle me-1"></i>Ativa
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="item-actions">
+            {% if aula.encerrada %}
+                <a href="{% url 'disciplina:aula_encerrada' aula.pk %}" class="btn btn-action btn-view">
+                    <i class="fas fa-eye me-1"></i>Ver Detalhes
+                </a>
+            {% else %}
+                <a href="{% url 'disciplina:aula_view' aula.pk %}" class="btn btn-action btn-manage">
+                    <i class="fas fa-play-circle me-1"></i>Gerenciar
+                </a>
+                <a href="{% url 'disciplina:aula_edit' aula.pk %}" class="btn btn-action btn-edit">
+                    <i class="fas fa-edit me-1"></i>Editar
+                </a>
+                <a href="{% url 'disciplina:aula_delete' aula.pk %}" class="btn btn-action btn-delete">
+                    <i class="fas fa-trash me-1"></i>Excluir
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% else %}
-<div class="alert alert-info">
-    Nenhuma aula cadastrada.
+<div class="empty-state">
+    <i class="fas fa-chalkboard"></i>
+    <h4>Nenhuma aula agendada</h4>
+    <p style="color: #9ca3af; margin-bottom: 2rem;">Comece agendando a primeira aula do sistema.</p>
+    <a href="{% url 'disciplina:aula_add' %}" class="btn btn-add">
+        <i class="fas fa-plus me-2"></i>Agendar Primeira Aula
+    </a>
 </div>
 {% endif %}
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const cards = document.querySelectorAll('.item-card');
+    cards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        card.style.display = searchData.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
 {% endblock %}

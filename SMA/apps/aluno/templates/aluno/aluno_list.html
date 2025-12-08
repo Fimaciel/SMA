@@ -4,56 +4,229 @@
 {% block title %}Gerenciar Alunos{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Alunos</h1>
-    <a href="{% url 'aluno:aluno_add' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Adicionar Aluno
-    </a>
+<style>
+    .page-header { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; padding: 2.5rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2); }
+    .page-header h1 { font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; }
+    .page-header p { opacity: 0.9; margin: 0; }
+    .btn-add { background: white; color: #1e40af; border: none; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); color: #1e40af; }
+    .search-bar { background: white; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .search-input { border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.95rem; transition: all 0.3s ease; }
+    .search-input:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+    .alunos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .aluno-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); transition: all 0.3s ease; border: 2px solid transparent; }
+    .aluno-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); border-color: #2563eb; }
+    .aluno-header { display: flex; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #f3f4f6; }
+    .aluno-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: white; margin-right: 1rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .aluno-info h5 { margin: 0; font-weight: 700; color: #1f2937; font-size: 1.1rem; }
+    .aluno-info small { color: #6b7280; font-size: 0.85rem; }
+    .aluno-details { margin-bottom: 1rem; }
+    .detail-item { display: flex; align-items: center; padding: 0.5rem 0; color: #4b5563; font-size: 0.9rem; }
+    .detail-item i { width: 24px; color: #2563eb; margin-right: 0.75rem; }
+    .detail-item strong { margin-right: 0.5rem; color: #1f2937; }
+    .aluno-status { display: inline-flex; align-items: center; padding: 0.4rem 0.875rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .aluno-status:hover { transform: scale(1.05); }
+    .status-ativo { background: #d1fae5; color: #065f46; }
+    .status-pendente { background: #fef3c7; color: #92400e; }
+    .aluno-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f3f4f6; flex-wrap: wrap; }
+    .btn-action { flex: 1; padding: 0.625rem; border-radius: 10px; font-weight: 600; font-size: 0.875rem; transition: all 0.3s ease; border: none; min-width: 80px; }
+    .btn-edit { background: #eff6ff; color: #1e40af; }
+    .btn-edit:hover { background: #dbeafe; transform: translateY(-2px); }
+    .btn-delete { background: #fef2f2; color: #dc2626; }
+    .btn-delete:hover { background: #fee2e2; transform: translateY(-2px); }
+    .btn-rfid { background: #fef3c7; color: #92400e; }
+    .btn-rfid:hover { background: #fde68a; transform: translateY(-2px); }
+    .btn-rfid.active { background: #d1fae5; color: #065f46; }
+    .empty-state { text-align: center; padding: 4rem 2rem; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .empty-state i { font-size: 5rem; color: #e5e7eb; margin-bottom: 1.5rem; }
+    .empty-state h4 { color: #6b7280; margin-bottom: 1rem; }
+    .stats-bar { background: white; border-radius: 15px; padding: 1rem 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; }
+    .stat-item { display: flex; align-items: center; gap: 0.75rem; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+    .stat-icon.green { background: #d1fae5; color: #059669; }
+    @media (max-width: 768px) { .alunos-grid { grid-template-columns: 1fr; } .page-header { padding: 1.5rem; } }
+</style>
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h1><i class="fas fa-user-graduate me-2"></i>Gerenciar Alunos</h1>
+            <p>Administre os alunos do sistema acadêmico</p>
+        </div>
+        <a href="{% url 'aluno:aluno_add' %}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Adicionar Aluno
+        </a>
+    </div>
 </div>
 
 {% if alunos %}
-<div class="card shadow mb-4">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Matrícula</th>
-                        <th>Período</th>
-                        <th>UID RFID</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for aluno in alunos %}
-                    <tr>
-                        <td>{{ aluno.nome }}</td>
-                        <td>{{ aluno.cpf }}</td>
-                        <td>{{ aluno.matricula }}</td>
-                        <td>{{ aluno.periodo }}</td>
-                        <td>{{ aluno.uid }}</td>
-                        <td>
-                            <a href="{% url 'aluno:aluno_edit' aluno.pk %}" class="btn btn-info btn-sm">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-                            <a href="{% url 'aluno:aluno_delete' aluno.pk %}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Excluir
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.85rem; color: #6b7280;">Total de Alunos</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;">{{ alunos|length }}</div>
+        </div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-icon green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.85rem; color: #6b7280;">RFID Ativos</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;" id="rfid-count">
+                {% for aluno in alunos %}{% if aluno.uid %}{{ forloop.counter }}{% endif %}{% endfor %}
+            </div>
         </div>
     </div>
 </div>
+
+<div class="search-bar">
+    <div class="input-group">
+        <span class="input-group-text" style="background: #f9fafb; border: 2px solid #e5e7eb; border-right: none; border-radius: 12px 0 0 12px;">
+            <i class="fas fa-search" style="color: #6b7280;"></i>
+        </span>
+        <input type="text" class="form-control search-input" id="searchInput" placeholder="Buscar por nome, CPF, matrícula..." style="border-left: none;">
+    </div>
+</div>
+
+<div class="alunos-grid">
+    {% for aluno in alunos %}
+    <div class="aluno-card" data-search="{{ aluno.nome|lower }} {{ aluno.cpf }} {{ aluno.matricula }}" data-aluno-id="{{ aluno.id }}">
+        <div class="aluno-header">
+            <div class="aluno-avatar">
+                {{ aluno.nome|slice:":2"|upper }}
+            </div>
+            <div class="aluno-info">
+                <h5>{{ aluno.nome }}</h5>
+                <small><i class="fas fa-calendar-alt me-1"></i>{{ aluno.data_nascimento|date:"d/m/Y" }}</small>
+            </div>
+        </div>
+        
+        <div class="aluno-details">
+            <div class="detail-item">
+                <i class="fas fa-id-card"></i>
+                <strong>CPF:</strong> {{ aluno.cpf }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-graduation-cap"></i>
+                <strong>Matrícula:</strong> {{ aluno.matricula }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-book"></i>
+                <strong>Período:</strong> {{ aluno.periodo }}
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-wifi"></i>
+                <strong>RFID:</strong>
+                <span class="aluno-status rfid-status {% if aluno.uid %}status-ativo{% else %}status-pendente{% endif %}" 
+                      onclick="toggleRFID({{ aluno.id }})" 
+                      title="Clique para {% if aluno.uid %}desativar{% else %}ativar{% endif %}">
+                    {% if aluno.uid %}
+                        <i class="fas fa-check-circle me-1"></i>Ativo
+                    {% else %}
+                        <i class="fas fa-exclamation-triangle me-1"></i>Pendente
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="aluno-actions">
+            <a href="{% url 'aluno:aluno_edit' aluno.pk %}" class="btn btn-action btn-edit">
+                <i class="fas fa-edit me-1"></i>Editar
+            </a>
+            <button onclick="toggleRFID({{ aluno.id }})" class="btn btn-action btn-rfid {% if aluno.uid %}active{% endif %}" data-aluno-id="{{ aluno.id }}">
+                <i class="fas fa-wifi me-1"></i>RFID
+            </button>
+            <a href="{% url 'aluno:aluno_delete' aluno.pk %}" class="btn btn-action btn-delete">
+                <i class="fas fa-trash me-1"></i>Excluir
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% else %}
-<div class="alert alert-info">
-    Nenhum aluno cadastrado.  
-    <a href="{% url 'aluno:aluno_add' %}" class="alert-link">Adicionar agora</a>.
+<div class="empty-state">
+    <i class="fas fa-user-graduate"></i>
+    <h4>Nenhum aluno cadastrado</h4>
+    <p style="color: #9ca3af; margin-bottom: 2rem;">Comece adicionando o primeiro aluno ao sistema.</p>
+    <a href="{% url 'aluno:aluno_add' %}" class="btn btn-add">
+        <i class="fas fa-plus me-2"></i>Adicionar Primeiro Aluno
+    </a>
 </div>
 {% endif %}
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const cards = document.querySelectorAll('.aluno-card');
+    cards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        card.style.display = searchData.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+function toggleRFID(alunoId) {
+    fetch(`/alunos/${alunoId}/toggle-rfid/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const card = document.querySelector(`[data-aluno-id="${alunoId}"]`);
+            const statusBadge = card.querySelector('.rfid-status');
+            const rfidButton = card.querySelector('.btn-rfid[data-aluno-id="${alunoId}"]');
+            
+            if (data.status === 'ativado') {
+                statusBadge.className = 'aluno-status rfid-status status-ativo';
+                statusBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i>Ativo';
+                statusBadge.title = 'Clique para desativar';
+                rfidButton.classList.add('active');
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'RFID Ativado!',
+                    text: `UID gerado: ${data.uid}`,
+                    confirmButtonColor: '#2563eb'
+                });
+            } else {
+                statusBadge.className = 'aluno-status rfid-status status-pendente';
+                statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Pendente';
+                statusBadge.title = 'Clique para ativar';
+                rfidButton.classList.remove('active');
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'RFID Desativado',
+                    text: 'O RFID foi desativado para este aluno.',
+                    confirmButtonColor: '#2563eb'
+                });
+            }
+            
+            // Atualizar contador
+            updateRFIDCount();
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Não foi possível alterar o status do RFID.',
+            confirmButtonColor: '#dc2626'
+        });
+    });
+}
+
+function updateRFIDCount() {
+    const activeCount = document.querySelectorAll('.status-ativo').length;
+    document.getElementById('rfid-count').textContent = activeCount;
+}
+</script>
 {% endblock %}

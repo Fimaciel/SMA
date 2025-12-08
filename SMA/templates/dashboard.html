@@ -1,123 +1,542 @@
-{% extends 'base.html' %}
-{% block title %}Dashboard{% endblock %}
+{% extends 'base.html' %} {% block title %}Dashboard{% endblock %} {% block
+content %}
+<style>
+	.hero-dashboard {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		padding: 3rem 0;
+		margin: -20px -20px 2rem -20px;
+		border-radius: 0 0 25px 25px;
+		position: relative;
+		overflow: hidden;
+	}
+	.hero-dashboard::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+		opacity: 0.3;
+	}
+	.hero-dashboard .container-fluid {
+		position: relative;
+		z-index: 2;
+	}
+	.hero-dashboard h1 {
+		font-weight: 700;
+		font-size: 2.5rem;
+		margin-bottom: 0.5rem;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+	.hero-dashboard p {
+		font-size: 1.1rem;
+		opacity: 0.9;
+		margin-bottom: 0;
+	}
 
-{% block content %}
-<h1 class="mb-4">Dashboard Principal</h1>
-<p class="lead">Bem-vindo ao Sistema de Gestão Acadêmica!</p>
+	.stats-cards {
+		margin-top: -2rem;
+		position: relative;
+		z-index: 3;
+	}
+	.stat-card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+		border: none;
+		transition: all 0.3s ease;
+		overflow: hidden;
+		height: 100%;
+	}
+	.stat-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+	}
+	.stat-card .card-body {
+		padding: 2rem;
+		position: relative;
+	}
+	.stat-card .stat-icon {
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		width: 60px;
+		height: 60px;
+		border-radius: 15px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5rem;
+		opacity: 0.8;
+	}
+	.stat-card .stat-value {
+		font-size: 2.5rem;
+		font-weight: 700;
+		margin-bottom: 0.5rem;
+		color: #2d3748;
+	}
+	.stat-card .stat-label {
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #718096;
+		margin-bottom: 1rem;
+	}
+	.stat-card .stat-change {
+		font-size: 0.8rem;
+		font-weight: 500;
+	}
+	.stat-card .stat-change.positive {
+		color: #48bb78;
+	}
+	.stat-card .stat-change.negative {
+		color: #f56565;
+	}
 
-<div class="row">
-    <!-- Total de Alunos -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card text-white bg-primary shadow-sm h-100">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total de Alunos</div>
-                        <div class="h5 mb-0 font-weight-bold">10</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-white-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	.charts-section {
+		margin-top: 2rem;
+	}
+	.chart-container {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		padding: 2rem;
+		margin-bottom: 2rem;
+	}
+	.chart-header {
+		display: flex;
+		justify-content: between;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+	.chart-header h5 {
+		font-weight: 600;
+		color: #2d3748;
+		margin-bottom: 0;
+	}
+	.chart-actions {
+		display: flex;
+		gap: 0.5rem;
+	}
 
-    <!-- Registros de Presença do Dia -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card text-white bg-success shadow-sm h-100">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">Presenças do Dia</div>
-                        <div class="h5 mb-0 font-weight-bold">15</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-clipboard-list fa-2x text-white-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	.activity-section {
+		margin-top: 2rem;
+	}
+	.activity-card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		overflow: hidden;
+	}
+	.activity-header {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		padding: 1.5rem 2rem;
+	}
+	.activity-header h5 {
+		font-weight: 600;
+		margin-bottom: 0;
+	}
+	.activity-body {
+		padding: 0;
+	}
+	.activity-list {
+		max-height: 400px;
+		overflow-y: auto;
+	}
+	.activity-item {
+		padding: 1rem 2rem;
+		border-bottom: 1px solid #f7fafc;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+	}
+	.activity-item:hover {
+		background: #f8f9fa;
+	}
+	.activity-item:last-child {
+		border-bottom: none;
+	}
+	.activity-avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		color: white;
+		margin-right: 1rem;
+	}
+	.activity-content {
+		flex: 1;
+	}
+	.activity-content .name {
+		font-weight: 600;
+		color: #2d3748;
+		margin-bottom: 0.25rem;
+	}
+	.activity-content .action {
+		font-size: 0.9rem;
+		color: #718096;
+	}
+	.activity-time {
+		font-size: 0.8rem;
+		color: #a0aec0;
+	}
+	.activity-badge {
+		padding: 0.25rem 0.75rem;
+		border-radius: 20px;
+		font-size: 0.75rem;
+		font-weight: 500;
+	}
 
-    <!-- Status da Aula Atual -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card text-white bg-warning shadow-sm h-100">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">Status da Aula Atual</div>
-                        <div class="h5 mb-0 font-weight-bold">Inativa</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-chalkboard fa-2x text-white-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Taxa de Presença Semanal (Novo Card) -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card text-white bg-info shadow-sm h-100">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">Taxa de Presença Semanal</div>
-                        <div class="h5 mb-0 font-weight-bold">85%</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-chart-line fa-2x text-white-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	.quick-actions {
+		margin-top: 2rem;
+	}
+	.quick-actions .card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		border: none;
+		transition: all 0.3s ease;
+	}
+	.quick-actions .card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+	}
+	.quick-actions .card-body {
+		padding: 2rem;
+		text-align: center;
+	}
+	.quick-actions .action-icon {
+		width: 60px;
+		height: 60px;
+		border-radius: 15px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5rem;
+		margin: 0 auto 1rem;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+	}
+	.quick-actions .card-title {
+		font-weight: 600;
+		color: #2d3748;
+		margin-bottom: 0.5rem;
+	}
+	.quick-actions .card-text {
+		color: #718096;
+		font-size: 0.9rem;
+	}
+
+	@media (max-width: 768px) {
+		.hero-dashboard {
+			padding: 2rem 0;
+			margin: -20px -20px 1rem -20px;
+		}
+		.hero-dashboard h1 {
+			font-size: 2rem;
+		}
+		.stats-cards {
+			margin-top: -1rem;
+		}
+		.stat-card .card-body {
+			padding: 1.5rem;
+		}
+		.chart-container {
+			padding: 1.5rem;
+		}
+		.activity-item {
+			padding: 1rem;
+		}
+	}
+</style>
+
+<div class="hero-dashboard">
+	<div class="container-fluid">
+		<div class="row align-items-center">
+			<div class="col-lg-8">
+				<h1><i class="fas fa-tachometer-alt me-3"></i>Dashboard</h1>
+				<p>
+					Bem-vindo ao Sistema de Gestão Acadêmica - Monitore tudo em tempo real
+				</p>
+			</div>
+			<div class="col-lg-4 text-end">
+				<div class="d-flex align-items-center justify-content-end">
+					<i class="fas fa-calendar-alt me-2"></i>
+					<span class="fw-semibold">{{ "now"|date:"d/m/Y" }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Atividade Recente</h6>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Aluno</th>
-                        <th>Ação</th>
-                        <th>Horário</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Ralph Edwards</td>
-                        <td><span class="badge bg-success">Entrada</span></td>
-                        <td>10:00:15</td>
-                    </tr>
-                    <tr>
-                        <td>Annette Black</td>
-                        <td><span class="badge bg-danger">Saída</span></td>
-                        <td>10:05:30</td>
-                    </tr>
-                    <tr>
-                        <td>Robert Fox</td>
-                        <td><span class="badge bg-success">Entrada</span></td>
-                        <td>10:07:00</td>
-                    </tr>
-                    <tr>
-                        <td>Eleanor Pena</td>
-                        <td><span class="badge bg-success">Entrada</span></td>
-                        <td>10:08:45</td>
-                    </tr>
-                    <tr>
-                        <td>Guy Hawkins</td>
-                        <td><span class="badge bg-danger">Saída</span></td>
-                        <td>10:15:00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="container-fluid">
+	<!-- Stats Cards -->
+	<div class="stats-cards">
+		<div class="row">
+			<div class="col-xl-3 col-md-6 mb-4">
+				<div class="stat-card">
+					<div class="card-body">
+						<div class="stat-icon bg-primary">
+							<i class="fas fa-users"></i>
+						</div>
+						<div class="stat-value">{{ total_alunos }}</div>
+						<div class="stat-label">Total de Alunos</div>
+						<div class="stat-change">
+							<i class="fas fa-wifi me-1"></i>{{ rfids_ativos }} RFID ativos
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6 mb-4">
+				<div class="stat-card">
+					<div class="card-body">
+						<div class="stat-icon bg-success">
+							<i class="fas fa-clipboard-check"></i>
+						</div>
+						<div class="stat-value">{{ presencas_hoje }}</div>
+						<div class="stat-label">Presenças Hoje</div>
+						<div class="stat-change positive">
+							<i class="fas fa-check me-1"></i>Registradas
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6 mb-4">
+				<div class="stat-card">
+					<div class="card-body">
+						<div class="stat-icon bg-warning">
+							<i class="fas fa-chalkboard-teacher"></i>
+						</div>
+						<div class="stat-value">{{ aulas_ativas }}</div>
+						<div class="stat-label">Aulas Ativas</div>
+						<div class="stat-change">
+							<i class="fas fa-clock me-1"></i>{{ total_aulas }} total
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6 mb-4">
+				<div class="stat-card">
+					<div class="card-body">
+						<div class="stat-icon bg-info">
+							<i class="fas fa-chart-line"></i>
+						</div>
+						<div class="stat-value">{{ taxa_presenca }}%</div>
+						<div class="stat-label">Taxa de Presença</div>
+						<div class="stat-change positive">
+							<i class="fas fa-check-circle me-1"></i>Geral
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Charts and Activity -->
+	<div class="row">
+		<!-- Charts -->
+		<div class="col-lg-8">
+			<div class="charts-section">
+				<div class="chart-container">
+					<div class="chart-header">
+						<h5><i class="fas fa-chart-bar me-2"></i>Frequência Semanal</h5>
+						<div class="chart-actions">
+							<button class="btn btn-outline-primary btn-sm">
+								<i class="fas fa-download me-1"></i>Exportar
+							</button>
+						</div>
+					</div>
+					<canvas id="attendanceChart" height="300"></canvas>
+				</div>
+
+				<div class="chart-container">
+					<div class="chart-header">
+						<h5><i class="fas fa-clock me-2"></i>Horários de Pico</h5>
+					</div>
+					<canvas id="peakHoursChart" height="200"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<!-- Activity Feed -->
+		<div class="col-lg-4">
+			<div class="activity-section">
+				<div class="activity-card">
+					<div class="activity-header">
+						<h5><i class="fas fa-history me-2"></i>Atividade Recente</h5>
+					</div>
+					<div class="activity-body">
+						<div class="activity-list">
+							{% if ultimas_atividades %}
+								{% for atividade in ultimas_atividades %}
+								<div class="activity-item">
+									<div class="activity-avatar {% if atividade.tipo == 'IN' %}bg-success{% else %}bg-danger{% endif %}">
+										{{ atividade.aluno.nome|slice:":2"|upper }}
+									</div>
+									<div class="activity-content">
+										<div class="name">{{ atividade.aluno.nome }}</div>
+										<div class="action">
+											{% if atividade.tipo == 'IN' %}
+												Registrou entrada
+											{% else %}
+												Registrou saída
+											{% endif %}
+										</div>
+									</div>
+									<div class="activity-time">{{ atividade.horario|time:"H:i" }}</div>
+								</div>
+								{% endfor %}
+							{% else %}
+								<div class="activity-item">
+									<div class="activity-content text-center w-100">
+										<div class="text-muted">Nenhuma atividade recente</div>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Quick Actions -->
+	<div class="quick-actions">
+		<div class="row">
+			<div class="col-md-3 mb-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="action-icon">
+							<i class="fas fa-plus"></i>
+						</div>
+						<h6 class="card-title">Nova Aula</h6>
+						<p class="card-text">Iniciar uma nova sessão de aula</p>
+						<a
+							href="{% url 'disciplina:aula_add' %}"
+							class="btn btn-primary w-100"
+							>Criar Aula</a
+						>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 mb-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="action-icon">
+							<i class="fas fa-users"></i>
+						</div>
+						<h6 class="card-title">Adicionar Aluno</h6>
+						<p class="card-text">Cadastrar novo estudante</p>
+						<a href="{% url 'aluno:aluno_add' %}" class="btn btn-success w-100"
+							>Adicionar</a
+						>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 mb-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="action-icon">
+							<i class="fas fa-chart-bar"></i>
+						</div>
+						<h6 class="card-title">Relatórios</h6>
+						<p class="card-text">Visualizar estatísticas detalhadas</p>
+						<a href="#" class="btn btn-info w-100">Ver Relatórios</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 mb-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="action-icon">
+							<i class="fas fa-cog"></i>
+						</div>
+						<h6 class="card-title">Configurações</h6>
+						<p class="card-text">Ajustar preferências do sistema</p>
+						<a href="#" class="btn btn-secondary w-100">Configurar</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-{% endblock %}
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% verbatim %}
+<script>
+	// Attendance Chart
+	const attendanceCtx = document
+		.getElementById("attendanceChart")
+		.getContext("2d");
+	new Chart(attendanceCtx, {
+		type: "line",
+		data: {
+			labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+			datasets: [
+				{
+					label: "Presença (%)",
+					data: [85, 92, 88, 95, 89, 91],
+					borderColor: "#667eea",
+					backgroundColor: "rgba(102, 126, 234, 0.1)",
+					tension: 0.4,
+					fill: true,
+				},
+			],
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				legend: {
+					display: false,
+				},
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					max: 100,
+				},
+			},
+		},
+	});
+
+	// Peak Hours Chart
+	const peakHoursCtx = document
+		.getElementById("peakHoursChart")
+		.getContext("2d");
+	new Chart(peakHoursCtx, {
+		type: "bar",
+		data: {
+			labels: ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"],
+			datasets: [
+				{
+					label: "Registros",
+					data: [12, 45, 23, 67, 34, 28],
+					backgroundColor: "#764ba2",
+					borderRadius: 5,
+				},
+			],
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				legend: {
+					display: false,
+				},
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+				},
+			},
+		},
+	});
+</script>
+{% endverbatim %}

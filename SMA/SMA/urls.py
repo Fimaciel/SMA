@@ -32,7 +32,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     # Dashboard
-    path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
+    path('', include('apps.core.urls')),
     path("professor/", include("apps.professor.urls")),
     path("presencas/", include("apps.presenca.urls")),
     path("horarios/", include("apps.horario.urls")),
