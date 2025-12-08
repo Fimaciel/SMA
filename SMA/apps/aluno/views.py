@@ -43,15 +43,16 @@ def toggle_rfid(request, pk):
     if aluno.uid:
         aluno.uid = None
         status = 'desativado'
+        message = 'RFID desativado. Adicione manualmente no cadastro do aluno.'
     else:
-        import uuid
-        aluno.uid = str(uuid.uuid4())[:8]
-        status = 'ativado'
+        status = 'pendente'
+        message = 'Para ativar o RFID, edite o aluno e adicione o UID manualmente.'
     
     aluno.save()
     
     return JsonResponse({
         'success': True,
         'status': status,
-        'uid': aluno.uid
+        'uid': aluno.uid,
+        'message': message
     })

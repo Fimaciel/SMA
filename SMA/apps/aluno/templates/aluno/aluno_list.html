@@ -170,51 +170,60 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
 });
 
 function toggleRFID(alunoId) {
-    fetch(`/alunos/${alunoId}/toggle-rfid/`, {
+    fetch(`/aluno/${alunoId}/toggle-rfid/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            const card = document.querySelector(`[data-aluno-id="${alunoId}"]`);
+            const card = document.querySelector(`.aluno-card[data-aluno-id="${alunoId}"]`);
             const statusBadge = card.querySelector('.rfid-status');
-            const rfidButton = card.querySelector('.btn-rfid[data-aluno-id="${alunoId}"]');
+            const rfidButton = card.querySelector(`.btn-rfid[data-aluno-id="${alunoId}"]`);
             
-            if (data.status === 'ativado') {
-                statusBadge.className = 'aluno-status rfid-status status-ativo';
-                statusBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i>Ativo';
-                statusBadge.title = 'Clique para desativar';
-                rfidButton.classList.add('active');
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'RFID Ativado!',
-                    text: `UID gerado: ${data.uid}`,
-                    confirmButtonColor: '#2563eb'
-                });
-            } else {
+            if (data.status === 'desativado') {
                 statusBadge.className = 'aluno-status rfid-status status-pendente';
                 statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Pendente';
-                statusBadge.title = 'Clique para ativar';
-                rfidButton.classList.remove('active');
+                statusBadge.title = 'Clique para editar';
+                if (rfidButton) rfidButton.classList.remove('active');
                 
                 Swal.fire({
                     icon: 'info',
                     title: 'RFID Desativado',
-                    text: 'O RFID foi desativado para este aluno.',
+                    text: data.message,
                     confirmButtonColor: '#2563eb'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ação Necessária',
+                    text: data.message,
+                    confirmButtonColor: '#f59e0b',
+                    confirmButtonText: 'Editar Aluno',
+                    showCancelButton: true,
+                    cancelButtonText: 'Fechar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `/aluno/${alunoId}/edit/`;
+                    }
                 });
             }
             
-            // Atualizar contador
             updateRFIDCount();
+        } else {
+            throw new Error('Resposta inválida do servidor');
         }
     })
     .catch(error => {
+        console.error('Erro:', error);
         Swal.fire({
             icon: 'error',
             title: 'Erro',
