@@ -38,7 +38,16 @@ def dashboard(request):
     rfids_ativos = Aluno.objects.filter(uid__isnull=False).exclude(uid='').count()
     
     # Últimas atividades (últimos 10 registros RFID)
-    ultimas_atividades = RegistroRFID.objects.select_related('aluno').order_by('-horario')[:10]
+    ultimas_atividades = RegistroRFID.objects.filter(
+        uid__isnull=False
+    ).exclude(uid='').order_by('-horario')[:10]
+    
+    # Adicionar informação do aluno para cada registro
+    for atividade in ultimas_atividades:
+        try:
+            atividade.aluno = Aluno.objects.get(uid=atividade.uid)
+        except Aluno.DoesNotExist:
+            atividade.aluno = None
     
     # Aulas da semana
     inicio_semana = hoje - timedelta(days=hoje.weekday())

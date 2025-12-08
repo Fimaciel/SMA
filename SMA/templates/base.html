@@ -5,22 +5,35 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{% block title %}Sistema de Gestão Acadêmica{% endblock %}</title>
+		<title>
+			{% block title %}Sistema de Monitoramento Acadêmico{% endblock %}
+		</title>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'%3E%3Cpath fill='%231e40af' d='M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM256 416c0-35.3 28.7-64 64-64s64 28.7 64 64v32H256V416zM96 192h80c8.8 0 16 7.2 16 16s-7.2 16-16 16H96c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64h80c8.8 0 16 7.2 16 16s-7.2 16-16 16H96c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64h80c8.8 0 16 7.2 16 16s-7.2 16-16 16H96c-8.8 0-16-7.2-16-16s7.2-16 16-16zm368-128c8.8 0 16 7.2 16 16s-7.2 16-16 16H384c-8.8 0-16-7.2-16-16s7.2-16 16-16h80zm0 64c8.8 0 16 7.2 16 16s-7.2 16-16 16H384c-8.8 0-16-7.2-16-16s7.2-16 16-16h80zm0 64c8.8 0 16 7.2 16 16s-7.2 16-16 16H384c-8.8 0-16-7.2-16-16s7.2-16 16-16h80z'/%3E%3C/svg%3E"
+		/>
 		{% bootstrap_css %}
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 		/>
-		{# Font Awesome para ícones #}
 		<link
 			href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
 			rel="stylesheet"
 		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+		/>
 		<style>
+			html {
+				scroll-behavior: smooth;
+			}
 			body {
 				display: flex;
 				min-height: 100vh;
-				background-color: #f8f9fa; /* Light background */
+				background-color: #f8f9fa;
 			}
 			#sidebar {
 				min-width: 280px;
@@ -60,12 +73,12 @@
 				min-height: 100vh;
 				transition: all 0.3s ease;
 				background: #f8f9fa;
+				position: relative;
 			}
 			.presente {
 				background-color: #c2f5c2 !important;
 				transition: 0.4s;
 			}
-
 			.sidebar-header {
 				padding: 2rem 1.5rem;
 				background: rgba(255, 255, 255, 0.08);
@@ -144,8 +157,7 @@
 				transform: scale(1.1);
 				color: #60a5fa;
 			}
-			.list-unstyled.components li.active > a,
-			a[aria-expanded="true"] {
+			.list-unstyled.components li.active > a {
 				color: #fff;
 				background: rgba(96, 165, 250, 0.25);
 				box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
@@ -178,6 +190,50 @@
 				transform: translateY(-2px);
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 			}
+			.loading-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.7);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 9999;
+			}
+			.loading-overlay.active {
+				display: flex;
+			}
+			.spinner {
+				width: 50px;
+				height: 50px;
+				border: 4px solid #f3f3f3;
+				border-top: 4px solid #2563eb;
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+			}
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+			.fade-in {
+				animation: fadeIn 0.5s ease-in;
+			}
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
 			@media (max-width: 768px) {
 				#sidebar {
 					margin-left: -280px;
@@ -188,100 +244,183 @@
 				#content.active {
 					width: calc(100% - 280px);
 				}
-				#sidebarCollapse {
-					display: block; /* Show hamburger button on small screens */
-				}
-			}
-			#sidebarCollapse {
-				display: none; /* Hide by default on large screens */
-				margin-left: 15px;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="sidebar">
 			<div class="sidebar-header">
-				<h3><i class="fas fa-graduation-cap me-2"></i>SMA</h3>
-				<div class="subtitle">Sistema Acadêmico</div>
+				<h3><i class="fas fa-school me-2"></i>SMA</h3>
+				<div class="subtitle">Sistema de Monitoramento Acadêmico</div>
 			</div>
 			<ul class="list-unstyled components">
 				<li>
-					<a href="{% url 'core:dashboard' %}">
-						<i class="fas fa-th-large"></i>
-						<span>Dashboard</span>
-					</a>
+					<a href="{% url 'core:dashboard' %}"
+						><i class="fas fa-th-large"></i><span>Dashboard</span></a
+					>
 				</li>
 				<li>
-					<a href="{% url 'disciplina:aula_list' %}">
-						<i class="fas fa-chalkboard"></i>
-						<span>Aulas</span>
-					</a>
+					<a href="{% url 'disciplina:aula_list' %}"
+						><i class="fas fa-chalkboard"></i><span>Aulas</span></a
+					>
 				</li>
 				<li>
-					<a href="{% url 'aluno:aluno_list' %}">
-						<i class="fas fa-user-graduate"></i>
-						<span>Alunos</span>
-					</a>
+					<a href="{% url 'aluno:aluno_list' %}"
+						><i class="fas fa-user-graduate"></i><span>Alunos</span></a
+					>
 				</li>
 				<li>
-					<a href="{% url 'curso:curso_list' %}">
-						<i class="fas fa-book-open"></i>
-						<span>Cursos</span>
-					</a>
+					<a href="{% url 'curso:curso_list' %}"
+						><i class="fas fa-book-open"></i><span>Cursos</span></a
+					>
 				</li>
 				<li>
-					<a href="{% url 'disciplina:disciplina_list' %}">
-						<i class="fas fa-chalkboard-teacher"></i>
-						<span>Disciplinas</span>
-					</a>
+					<a href="{% url 'disciplina:disciplina_list' %}"
+						><i class="fas fa-chalkboard-teacher"></i
+						><span>Disciplinas</span></a
+					>
 				</li>
 				<li>
-					<a href="{% url 'professor:professor_list' %}">
-						<i class="fas fa-user-tie"></i>
-						<span>Professores</span>
-					</a>
+					<a href="{% url 'professor:professor_list' %}"
+						><i class="fas fa-user-tie"></i><span>Professores</span></a
+					>
 				</li>
 			</ul>
 			<div class="sidebar-footer">
-				<a href="{% url 'admin:index' %}" class="btn">
-					<i class="fas fa-cog me-2"></i>Painel Admin
-				</a>
+				<a href="{% url 'admin:index' %}" class="btn"
+					><i class="fas fa-cog me-2"></i>Painel Admin</a
+				>
 			</div>
 		</div>
 
 		<div id="content">
+			<div class="loading-overlay" id="loadingOverlay">
+				<div class="spinner"></div>
+			</div>
 			{% if messages %}
 			<div class="container mt-3">
 				{% for message in messages %}
 				<div
-					class="alert alert-{{ message.tags }} alert-dismissible fade show"
+					class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in"
 					role="alert"
 				>
+					<i
+						class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"
+					></i>
 					{{ message }}
 					<button
 						type="button"
 						class="btn-close"
 						data-bs-dismiss="alert"
-						aria-label="Close"
 					></button>
 				</div>
 				{% endfor %}
 			</div>
-			{% endif %} {% block content %} {% endblock %}
+			{% endif %} {% block content %}{% endblock %}
 		</div>
 
 		{% bootstrap_javascript %}
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<script>
 			document.addEventListener("DOMContentLoaded", function () {
-				var sidebarCollapse = document.getElementById("sidebarCollapse");
-				if (sidebarCollapse) {
-					sidebarCollapse.addEventListener("click", function () {
-						document.getElementById("sidebar").classList.toggle("active");
-						document.getElementById("content").classList.toggle("active");
+				flatpickr("input[type='date']", {
+					locale: "pt",
+					dateFormat: "Y-m-d",
+					altInput: true,
+					altFormat: "d/m/Y",
+					onReady: function (d, s, i) {
+						i.altInput.placeholder = "Selecione a data";
+					},
+				});
+				flatpickr("input[type='time']", {
+					locale: "pt",
+					enableTime: true,
+					noCalendar: true,
+					dateFormat: "H:i",
+					time_24hr: true,
+					onReady: function (d, s, i) {
+						i.input.placeholder = "Selecione a hora";
+					},
+				});
+				flatpickr("input[type='datetime-local']", {
+					locale: "pt",
+					enableTime: true,
+					dateFormat: "Y-m-d H:i",
+					altInput: true,
+					altFormat: "d/m/Y H:i",
+					time_24hr: true,
+					onReady: function (d, s, i) {
+						i.altInput.placeholder = "Selecione data e hora";
+					},
+				});
+
+				document
+					.querySelectorAll(
+						'input[type="text"]:not([placeholder]), input[type="email"]:not([placeholder]), input[type="number"]:not([placeholder]), textarea:not([placeholder])'
+					)
+					.forEach(function (input) {
+						var label = input
+							.closest(".mb-3, .form-group")
+							?.querySelector("label");
+						if (label && !input.placeholder)
+							input.placeholder =
+								"Digite " +
+								label.textContent.trim().replace("*", "").trim().toLowerCase();
 					});
-				}
+
+				document
+					.querySelectorAll("select:not([data-placeholder])")
+					.forEach(function (select) {
+						if (select.options.length > 0 && select.options[0].value === "") {
+							var label = select
+								.closest(".mb-3, .form-group")
+								?.querySelector("label");
+							if (label)
+								select.options[0].text =
+									"Selecione " +
+									label.textContent
+										.trim()
+										.replace("*", "")
+										.trim()
+										.toLowerCase();
+						}
+					});
+
+				document
+					.querySelectorAll(".item-card, .aluno-card, .stat-card")
+					.forEach(function (card, index) {
+						card.style.animationDelay = index * 0.05 + "s";
+						card.classList.add("fade-in");
+					});
+
+				document.querySelectorAll('a[href*="delete"]').forEach(function (link) {
+					link.addEventListener("click", function (e) {
+						if (!link.classList.contains("confirmed")) {
+							e.preventDefault();
+							Swal.fire({
+								title: "Tem certeza?",
+								text: "Esta ação não pode ser desfeita!",
+								icon: "warning",
+								showCancelButton: true,
+								confirmButtonColor: "#dc2626",
+								cancelButtonColor: "#6b7280",
+								confirmButtonText: "Sim, excluir!",
+								cancelButtonText: "Cancelar",
+							}).then((result) => {
+								if (result.isConfirmed) window.location.href = link.href;
+							});
+						}
+					});
+				});
+
+				document.querySelectorAll("form").forEach(function (form) {
+					form.addEventListener("submit", function () {
+						document.getElementById("loadingOverlay").classList.add("active");
+					});
+				});
 			});
 		</script>
 	</body>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </html>
