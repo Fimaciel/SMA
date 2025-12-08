@@ -3,6 +3,7 @@ from django.db import models
 class Disciplina(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True, null=True)
+    carga_horaria = models.IntegerField(null=True, blank=True, help_text="Carga horária em horas")
 
     alunos = models.ManyToManyField("aluno.Aluno", related_name="disciplinas_relacionadas")
 

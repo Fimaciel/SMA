@@ -11,10 +11,11 @@ from apps.aluno.models import Aluno
 class DisciplinaForm(forms.ModelForm):
     class Meta:
         model = Disciplina
-        fields = ["nome", "descricao", "alunos"]
+        fields = ["nome", "descricao", "carga_horaria", "alunos"]
         widgets = {
             "nome": forms.TextInput(attrs={'class': 'form-control'}),
             "descricao": forms.Textarea(attrs={'class': 'form-control'}),
+            "carga_horaria": forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             "alunos": forms.CheckboxSelectMultiple(),  
         }
         

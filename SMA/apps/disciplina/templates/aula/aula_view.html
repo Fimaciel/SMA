@@ -39,14 +39,18 @@
                 <strong><i class="fas fa-calendar-alt me-1"></i>Data</strong>
                 <span>{{ aula.data|date:"d/m/Y" }}</span>
             </div>
+            {% if aula.professor %}
             <div class="info-item">
                 <strong><i class="fas fa-user-tie me-1"></i>Professor</strong>
                 <span>{{ aula.professor.nome }}</span>
             </div>
+            {% endif %}
+            {% if aula.curso %}
             <div class="info-item">
                 <strong><i class="fas fa-graduation-cap me-1"></i>Curso</strong>
                 <span>{{ aula.curso.nome }}</span>
             </div>
+            {% endif %}
             <div class="info-item">
                 <strong><i class="fas fa-clock me-1"></i>Horário</strong>
                 <span>{{ aula.horario_inicio|time:"H:i" }} – {{ aula.horario_fim|time:"H:i" }}</span>

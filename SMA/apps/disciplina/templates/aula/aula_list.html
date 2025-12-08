@@ -73,17 +73,39 @@
 </div>
 
 <div class="search-bar">
-    <div class="input-group">
-        <span class="input-group-text" style="background: #f9fafb; border: 2px solid #e5e7eb; border-right: none; border-radius: 12px 0 0 12px;">
-            <i class="fas fa-search" style="color: #6b7280;"></i>
-        </span>
-        <input type="text" class="form-control search-input" id="searchInput" placeholder="Buscar por disciplina, professor, curso..." style="border-left: none;">
+    <div class="row g-3">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text" style="background: #f9fafb; border: 2px solid #e5e7eb; border-right: none; border-radius: 12px 0 0 12px;">
+                    <i class="fas fa-search" style="color: #6b7280;"></i>
+                </span>
+                <input type="text" class="form-control search-input" id="searchInput" placeholder="Buscar por disciplina, professor, curso..." style="border-left: none;">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select search-input" id="filterDisciplina" style="border: 2px solid #e5e7eb;">
+                <option value="">Todas as disciplinas</option>
+                {% for aula in aulas %}
+                    <option value="{{ aula.disciplina.nome }}">{{ aula.disciplina.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select search-input" id="filterStatus" style="border: 2px solid #e5e7eb;">
+                <option value="">Todos os status</option>
+                <option value="ativa">Ativas</option>
+                <option value="encerrada">Encerradas</option>
+            </select>
+        </div>
     </div>
 </div>
 
 <div class="items-grid">
     {% for aula in aulas %}
-    <div class="item-card" data-search="{{ aula.disciplina.nome|lower }} {{ aula.professor.nome|lower }} {{ aula.curso.nome|lower }}">
+    <div class="item-card" 
+         data-search="{{ aula.disciplina.nome|lower }} {{ aula.professor.nome|lower }} {{ aula.curso.nome|lower }}"
+         data-disciplina="{{ aula.disciplina.nome }}"
+         data-status="{% if aula.encerrada %}encerrada{% else %}ativa{% endif %}">
         <div class="item-header">
             <div class="item-icon">
                 <i class="fas fa-book-open"></i>
@@ -95,14 +117,18 @@
         </div>
         
         <div class="item-details">
+            {% if aula.professor %}
             <div class="detail-item">
                 <i class="fas fa-user-tie"></i>
                 <strong>Professor:</strong> {{ aula.professor.nome }}
             </div>
+            {% endif %}
+            {% if aula.curso %}
             <div class="detail-item">
                 <i class="fas fa-graduation-cap"></i>
                 <strong>Curso:</strong> {{ aula.curso.nome }}
             </div>
+            {% endif %}
             <div class="detail-item">
                 <i class="fas fa-clock"></i>
                 <strong>Horário:</strong> {{ aula.horario_inicio|time:"H:i" }} - {{ aula.horario_fim|time:"H:i" }}
@@ -154,13 +180,41 @@
 {% endif %}
 
 <script>
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    const searchTerm = this.value.toLowerCase();
+function filterCards() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const disciplinaFilter = document.getElementById('filterDisciplina').value;
+    const statusFilter = document.getElementById('filterStatus').value;
     const cards = document.querySelectorAll('.item-card');
+    
     cards.forEach(card => {
         const searchData = card.getAttribute('data-search');
-        card.style.display = searchData.includes(searchTerm) ? '' : 'none';
+        const disciplina = card.getAttribute('data-disciplina');
+        const status = card.getAttribute('data-status');
+        
+        const matchSearch = searchData.includes(searchTerm);
+        const matchDisciplina = !disciplinaFilter || disciplina === disciplinaFilter;
+        const matchStatus = !statusFilter || status === statusFilter;
+        
+        card.style.display = (matchSearch && matchDisciplina && matchStatus) ? '' : 'none';
     });
+}
+
+document.getElementById('searchInput').addEventListener('keyup', filterCards);
+document.getElementById('filterDisciplina').addEventListener('change', filterCards);
+document.getElementById('filterStatus').addEventListener('change', filterCards);
+
+// Remover duplicatas do select de disciplinas
+const disciplinaSelect = document.getElementById('filterDisciplina');
+const uniqueDisciplinas = new Set();
+const options = Array.from(disciplinaSelect.options);
+options.forEach((option, index) => {
+    if (index > 0) {
+        if (uniqueDisciplinas.has(option.value)) {
+            option.remove();
+        } else {
+            uniqueDisciplinas.add(option.value);
+        }
+    }
 });
 </script>
 {% endblock %}

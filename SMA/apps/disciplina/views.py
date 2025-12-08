@@ -40,6 +40,7 @@ class AulaListView(ListView):
     model = Aula
     template_name = "aula/aula_list.html"
     context_object_name = "aulas"
+    queryset = Aula.objects.select_related('disciplina', 'professor', 'curso').order_by('-data', '-horario_inicio')
 
 
 class AulaCreateView(CreateView):
