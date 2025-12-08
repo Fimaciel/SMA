@@ -1,4 +1,6 @@
 django
 python-dotenv 
 psycopg2-binary
-serialdjango-bootstrap-v5
+pyserial
+django-bootstrap5
+djangorestframework
