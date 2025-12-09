@@ -1,0 +1,65 @@
+#include <SPI.h>
+#include <MFRC522.h>
+
+#define SS_PIN 10
+#define RST_PIN 9
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+struct Usuario {
+  String uid;
+  bool dentro;
+};
+
+Usuario usuarios[10];
+int totalUsuarios = 0;
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  mfrc522.PCD_Init();
+  Serial.println("Aproxime o cartão RFID...");
+}
+
+void loop() {
+  if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
+    return;
+  }
+
+  // Monta o UID
+  String uidString = "";
+  for (byte i = 0; i < mfrc522.uid.size; i++) {
+    uidString += String(mfrc522.uid.uidByte[i], HEX);
+  }
+
+  int index = buscarUsuario(uidString);
+  String tipo;
+
+  if (index == -1) {
+    usuarios[totalUsuarios].uid = uidString;
+    usuarios[totalUsuarios].dentro = true;
+    tipo = "IN";
+    totalUsuarios++;
+  } else {
+    usuarios[index].dentro = !usuarios[index].dentro; 
+    tipo = usuarios[index].dentro ? "IN" : "OUT";
+  }
+
+  // ENVIA JSON
+  Serial.print("{\"uid\":\"");
+  Serial.print(uidString);
+  Serial.print("\", \"tipo\":\"");
+  Serial.print(tipo);
+  Serial.println("\"}");
+
+  delay(1000);
+}
+
+int buscarUsuario(String uid) {
+  for (int i = 0; i < totalUsuarios; i++) {
+    if (usuarios[i].uid == uid) {
+      return i;
+    }
+  }
+  return -1;
+}
